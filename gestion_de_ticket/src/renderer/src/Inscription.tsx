@@ -142,44 +142,60 @@ export default function JoySignInSideTemplate(): React.ReactElement {
               <Stack sx={{ gap: 1 }}>
                 <Typography component="h1" level="h3">
                   Authentification
+                </Typography> <Typography level="body-sm">
+                  Nouveau dans l&apos;entreprise?{' '}
+                  <Link href="#replace-with-a-link" level="title-sm">
+                    Créer un compte!
+                  </Link>
                 </Typography>
               </Stack>
             </Stack>
             <form
-              onSubmit={(event: React.FormEvent<SignInFormElement>) => {
+              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
-                const formElements = event.currentTarget.elements;
+                const formData = new FormData(event.currentTarget);
                 const data = {
-                  email: formElements.email.value,
-                  password: formElements.password.value,
-                  persistent: formElements.persistent.checked,
+                  matricule: formData.get('matricule'),
+                  nomPrenom: formData.get('nomPrenom'),
+                  email: formData.get('email'),
+                  adresse: formData.get('adresse'),
+                  login: formData.get('login'),
+                  password: formData.get('password'),
                 };
                 alert(JSON.stringify(data, null, 2));
               }}
             >
               <FormControl required>
+                <FormLabel>Matricule</FormLabel>
+                <Input type="text" name="matricule" />
+              </FormControl>
+              <FormControl required>
+                <FormLabel>Nom & Prénom</FormLabel>
+                <Input type="text" name="nomPrenom" />
+              </FormControl>
+              <FormControl required>
                 <FormLabel>Email</FormLabel>
                 <Input type="email" name="email" />
+              </FormControl>
+              <FormControl required>
+                <FormLabel>Adresse</FormLabel>
+                <Input type="text" name="adresse" />
+              </FormControl>
+              <FormControl required>
+                <FormLabel>Login</FormLabel>
+                <Input type="text" name="login" />
               </FormControl>
               <FormControl required>
                 <FormLabel>Mot de passe</FormLabel>
                 <Input type="password" name="password" />
               </FormControl>
               <Stack sx={{ gap: 4, mt: 2 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Link level="title-sm" href="#replace-with-a-link">
-                    Mot de passe oublié?
-                  </Link>
-                </Box>
                 <Button type="submit" fullWidth>
-                  Authentifier
+                  S'inscrire
                 </Button>
+                <Link href="#" level="title-sm">
+                  Retour
+                </Link>
               </Stack>
             </form>
           </Box>
