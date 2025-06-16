@@ -14,7 +14,8 @@ import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import TT_Logo from '../assets/TT_Logo.jsx';
+import TT_Logo from './assets/TT_Logo.svg';
+
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -93,15 +94,24 @@ export default function JoySignInSideTemplate(): React.ReactElement {
             flexDirection: 'column',
             minHeight: '100dvh',
             width: '100%',
-            px: 2,
+            px: 3,
           }}
         >
-          <Box component="header" sx={{ py: 3, display: 'flex', justifyContent: 'space-between' }}>
+          <Box 
+            component="header" 
+            sx={{ 
+              py: 2,
+              px: 3,
+              display: 'flex', 
+              justifyContent: 'space-between',
+              minHeight: '100px',
+              width: '100%',
+              alignItems: 'center'
+            }}
+          >
             <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
-              <IconButton variant="soft" color="primary" size="sm">
-                <img src={TT_Logo} alt="TT Logo" style={{ width: 24, height: 24 }} />
-              </IconButton>
-              <Typography level="title-lg">TT Logo</Typography>
+              <img src={TT_Logo} alt="TT Logo" style={{ width: 86, height: 86 }} />
+              <Typography level="title-lg">Espace Personnel</Typography>
             </Box>
             <ColorSchemeToggle />
           </Box>
@@ -182,7 +192,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" sx={{ textAlign: 'center' }}>
-              © Your company {new Date().getFullYear()}
+              © Tunisie Telecom {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>
