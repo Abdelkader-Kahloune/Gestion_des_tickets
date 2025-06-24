@@ -138,18 +138,21 @@ export default function JoySignInSideTemplate(): React.ReactElement {
               },
             }}
           >
+            
             <Stack sx={{ gap: 4, mb: 2 }}>
-              <Stack sx={{ gap: 1 }}>
-                <Typography component="h1" level="h3">
-                  Authentification
-                </Typography> <Typography level="body-sm">
-                  Nouveau dans l&apos;entreprise?{' '}
-                  <Link href="#replace-with-a-link" level="title-sm">
-                    Créer un compte!
-                  </Link>
-                </Typography>
-              </Stack>
+            <Stack sx={{ gap: 1 }}>
+              <Typography component="h1" level="h3">
+                Authentification
+              </Typography>
+              <Typography level="body-sm">
+                have an account?{' '}
+                <Link href="/login" level="title-sm">
+                  Register!
+                </Link>
+              </Typography>
             </Stack>
+          </Stack>
+            
             <form
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
@@ -193,9 +196,6 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                 <Button type="submit" fullWidth>
                   S'inscrire
                 </Button>
-                <Link href="#" level="title-sm">
-                  Retour
-                </Link>
               </Stack>
             </form>
           </Box>

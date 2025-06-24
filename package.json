@@ -25,9 +25,12 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@firecms/neat": "^0.4.0",
     "@mui/icons-material": "^7.1.1",
     "@mui/joy": "^5.0.0-beta.52",
-    "react-svg": "^16.3.0"
+    "react-router-dom": "^7.6.2",
+    "react-svg": "^16.3.0",
+    "three": "^0.169.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
