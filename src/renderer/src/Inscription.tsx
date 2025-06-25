@@ -1,30 +1,20 @@
-import * as React from 'react';
-import { CssVarsProvider, extendTheme, useColorScheme } from '@mui/joy/styles';
-import GlobalStyles from '@mui/joy/GlobalStyles';
-import CssBaseline from '@mui/joy/CssBaseline';
-import Box from '@mui/joy/Box';
-import Button from '@mui/joy/Button';
-
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import IconButton, { IconButtonProps } from '@mui/joy/IconButton';
-import Link from '@mui/joy/Link';
-import Input from '@mui/joy/Input';
-import Typography from '@mui/joy/Typography';
-import Stack from '@mui/joy/Stack';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import TT_Logo from './assets/TT_Logo.svg';
-
-
-interface FormElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
-  password: HTMLInputElement;
-  persistent: HTMLInputElement;
-}
-interface SignInFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
+import * as React from "react";
+import NeatBackground from "./styles/background";
+import { CssVarsProvider, extendTheme, useColorScheme } from "@mui/joy/styles";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import CssBaseline from "@mui/joy/CssBaseline";
+import Box from "@mui/joy/Box";
+import Button from "@mui/joy/Button";
+import FormControl from "@mui/joy/FormControl";
+import FormLabel from "@mui/joy/FormLabel";
+import IconButton, { IconButtonProps } from "@mui/joy/IconButton";
+import Link from "@mui/joy/Link";
+import Input from "@mui/joy/Input";
+import Typography from "@mui/joy/Typography";
+import Stack from "@mui/joy/Stack";
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
+import TT_Logo from "./assets/TT_Logo.svg";
 
 function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
   const { onClick, ...other } = props;
@@ -40,12 +30,12 @@ function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
       variant="outlined"
       disabled={!mounted}
       onClick={(event) => {
-        setMode(mode === 'light' ? 'dark' : 'light');
+        setMode(mode === "light" ? "dark" : "light");
         onClick?.(event);
       }}
       {...other}
     >
-      {mode === 'light' ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
+      {mode === "light" ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
     </IconButton>
   );
 }
@@ -53,8 +43,8 @@ function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
 const customTheme = extendTheme({
   colorSchemes: {
     light: {},
-    dark: {}
-  }
+    dark: {},
+  },
 });
 
 export default function JoySignInSideTemplate(): React.ReactElement {
@@ -63,54 +53,58 @@ export default function JoySignInSideTemplate(): React.ReactElement {
       <CssBaseline />
       <GlobalStyles
         styles={{
-          ':root': {
-            '--Form-maxWidth': '800px',
-            '--Transition-duration': '0s',
+          ":root": {
+            "--Form-maxWidth": "800px",
+            "--Transition-duration": "0s",
           },
         }}
       />
       <Box
         sx={(theme) => ({
-          width: { xs: '100%', md: '50vw' },
-          transition: 'width var(--Transition-duration)',
-          transitionDelay: 'calc(var(--Transition-duration) + 0.1s)',
-          position: 'fixed',
+          width: { xs: "100%", md: "50vw" },
+          transition: "width var(--Transition-duration)",
+          transitionDelay: "calc(var(--Transition-duration) + 0.1s)",
+          position: "fixed",
           right: 0,
           top: 0,
           bottom: 0,
-          zIndex: 1,
-          display: 'flex',
-          justifyContent: 'flex-end',
-          backdropFilter: 'blur(12px)',
-          backgroundColor: 'rgba(255 255 255 / 0.2)',
-          [theme.getColorSchemeSelector('dark')]: {
-            backgroundColor: 'rgba(19 19 24 / 0.4)',
+          zIndex: 10001,
+          display: "flex",
+          justifyContent: "flex-end",
+          backdropFilter: "blur(30px)",
+          backgroundColor: "rgba(255 255 255 / 0.7)",
+          [theme.getColorSchemeSelector("dark")]: {
+            backgroundColor: "rgba(19 19 24 / 0.7)",
           },
         })}
       >
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100dvh',
-            width: '100%',
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "100dvh",
+            width: "100%",
             px: 3,
           }}
         >
-          <Box 
-            component="header" 
-            sx={{ 
+          <Box
+            component="header"
+            sx={{
               py: 2,
               px: 3,
-              display: 'flex', 
-              justifyContent: 'space-between',
-              minHeight: '100px',
-              width: '100%',
-              alignItems: 'center'
+              display: "flex",
+              justifyContent: "space-between",
+              minHeight: "100px",
+              width: "100%",
+              alignItems: "center",
             }}
           >
-            <Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
-              <img src={TT_Logo} alt="TT Logo" style={{ width: 86, height: 86 }} />
+            <Box sx={{ gap: 2, display: "flex", alignItems: "center" }}>
+              <img
+                src={TT_Logo}
+                alt="TT Logo"
+                style={{ width: 86, height: 86 }}
+              />
               <Typography level="title-lg">Espace Personnel</Typography>
             </Box>
             <ColorSchemeToggle />
@@ -118,60 +112,53 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           <Box
             component="main"
             sx={{
-              my: 'auto',
+              my: "auto",
               py: 2,
               pb: 5,
-              display: 'flex',
-              flexDirection: 'column',
+              display: "flex",
+              flexDirection: "column",
               gap: 2,
               width: 400,
-              maxWidth: '100%',
-              mx: 'auto',
-              borderRadius: 'sm',
-              '& form': {
-                display: 'flex',
-                flexDirection: 'column',
+              maxWidth: "100%",
+              mx: "auto",
+              borderRadius: "sm",
+              "& form": {
+                display: "flex",
+                flexDirection: "column",
                 gap: 2,
               },
               [`& .MuiFormLabel-asterisk`]: {
-                visibility: 'hidden',
+                visibility: "hidden",
               },
             }}
           >
-            
             <Stack sx={{ gap: 4, mb: 2 }}>
-            <Stack sx={{ gap: 1 }}>
-              <Typography component="h1" level="h3">
-                Authentification
-              </Typography>
-              <Typography level="body-sm">
-                have an account?{' '}
-                <Link href="/login" level="title-sm">
-                  Register!
-                </Link>
-              </Typography>
+              <Stack sx={{ gap: 1 }}>
+                <Typography component="h1" level="h3">
+                  Inscription
+                </Typography>
+                <Typography level="body-sm">
+                  Déjà inscrit?{" "}
+                  <Link href="/login" level="title-sm">
+                    Se connecter!
+                  </Link>
+                </Typography>
+              </Stack>
             </Stack>
-          </Stack>
-            
+
             <form
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
                 const formData = new FormData(event.currentTarget);
                 const data = {
-                  matricule: formData.get('matricule'),
-                  nomPrenom: formData.get('nomPrenom'),
-                  email: formData.get('email'),
-                  adresse: formData.get('adresse'),
-                  login: formData.get('login'),
-                  password: formData.get('password'),
+                  nomPrenom: formData.get("nomPrenom"),
+                  email: formData.get("email"),
+                  adresse: formData.get("adresse"),
+                  password: formData.get("password"),
                 };
                 alert(JSON.stringify(data, null, 2));
               }}
             >
-              <FormControl required>
-                <FormLabel>Matricule</FormLabel>
-                <Input type="text" name="matricule" />
-              </FormControl>
               <FormControl required>
                 <FormLabel>Nom & Prénom</FormLabel>
                 <Input type="text" name="nomPrenom" />
@@ -185,10 +172,6 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                 <Input type="text" name="adresse" />
               </FormControl>
               <FormControl required>
-                <FormLabel>Login</FormLabel>
-                <Input type="text" name="login" />
-              </FormControl>
-              <FormControl required>
                 <FormLabel>Mot de passe</FormLabel>
                 <Input type="password" name="password" />
               </FormControl>
@@ -200,34 +183,13 @@ export default function JoySignInSideTemplate(): React.ReactElement {
             </form>
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
-            <Typography level="body-xs" sx={{ textAlign: 'center' }}>
+            <Typography level="body-xs" sx={{ textAlign: "center" }}>
               © Tunisie Telecom {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>
       </Box>
-      <Box
-        sx={(theme) => ({
-          height: '100%',
-          position: 'fixed',
-          right: 0,
-          top: 0,
-          bottom: 0,
-          left: { xs: 0, md: '50vw' },
-          transition:
-            'background-image var(--Transition-duration), left var(--Transition-duration) !important',
-          transitionDelay: 'calc(var(--Transition-duration) + 0.1s)',
-          backgroundColor: 'background.level1',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
-          [theme.getColorSchemeSelector('dark')]: {
-            backgroundImage:
-              'url(https://images.unsplash.com/photo-1572072393749-3ca9c8ea0831?auto=format&w=1000&dpr=2)',
-          },
-        })}
-      />
+      <NeatBackground />
     </CssVarsProvider>
   );
 }

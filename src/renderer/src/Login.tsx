@@ -81,7 +81,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           zIndex: 10001,
           display: "flex",
           justifyContent: "flex-end",
-          backdropFilter: "blur(12px)",
+          backdropFilter: "blur(30px)",
           backgroundColor: "rgba(255 255 255 / 0.7)",
           [theme.getColorSchemeSelector("dark")]: {
             backgroundColor: "rgba(19 19 24 / 0.7)",
@@ -159,11 +159,10 @@ export default function JoySignInSideTemplate(): React.ReactElement {
             <form
               onSubmit={(event: React.FormEvent<SignInFormElement>) => {
                 event.preventDefault();
-                const formElements = event.currentTarget.elements;
+                const formData = new FormData(event.currentTarget);
                 const data = {
-                  email: formElements.email.value,
-                  password: formElements.password.value,
-                  persistent: formElements.persistent.checked,
+                  email: formData.get("email"),
+                  password: formData.get("password"),
                 };
                 alert(JSON.stringify(data, null, 2));
               }}
