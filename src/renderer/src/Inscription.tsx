@@ -17,6 +17,7 @@ import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import TT_Logo from "./assets/TT_Logo.svg";
 import Snackbar from "@mui/joy/Snackbar";
 import Alert from "@mui/joy/Alert";
+import { useNavigate } from "react-router-dom";
 
 function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
   const { onClick, ...other } = props;
@@ -51,6 +52,7 @@ const customTheme = extendTheme({
 
 export default function JoySignInSideTemplate(): React.ReactElement {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const navigate = useNavigate();
 
   const addUser = async (
     event: React.FormEvent<HTMLFormElement>
@@ -68,13 +70,12 @@ export default function JoySignInSideTemplate(): React.ReactElement {
 
     try {
       const res = await window.api.addUser(data);
-      // If your backend returns a success flag, you can check it here
       if (res && res.success === false && res.message) {
         setOpenSnackbar(true);
+      } else {
+        navigate(`/user/${data.matricule}`);
       }
-      // ...existing code...
     } catch (error: any) {
-      // Show snackbar if error is about user already existing
       if (
         typeof error?.message === "string" &&
         (error.message.includes("constraint failed") ||
@@ -226,7 +227,8 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           </Box>
         </Box>
       </Box>
-      <NeatBackground />
+      {/* Only show NeatBackground if not redirected/authenticated */}
+      {/* You can use a state to track if navigation happened, but since navigate() unmounts this component, this is enough */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
@@ -243,6 +245,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           Un utilisateur avec ce login, email ou matricule existe déjà.
         </Alert>
       </Snackbar>
+      <NeatBackground />
     </CssVarsProvider>
   );
 }

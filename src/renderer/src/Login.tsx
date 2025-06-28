@@ -62,6 +62,7 @@ const customTheme = extendTheme({
 
 export default function JoySignInSideTemplate(): React.ReactElement {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [authenticated, setAuthenticated] = React.useState(false);
   const navigate = useNavigate();
 
   return (
@@ -174,9 +175,10 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                   if (!user || user.mot_de_passe !== password) {
                     setOpenSnackbar(true);
                   } else {
+                    setAuthenticated(true);
                     if (user.role === "admin") {
                       navigate("/dashboard");
-                    } else if (user.role === "user") {
+                    } else {
                       navigate(`/user/${user.matricule}`);
                     }
                   }
@@ -220,19 +222,19 @@ export default function JoySignInSideTemplate(): React.ReactElement {
       </Box>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={4000}
+        autoHideDuration={2000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          fontSize: "1rem",
+          zIndex: 10005,
+          width: "100%",
+          maxWidth: 100,
+        }}
       >
-        <Alert
-          color="danger"
-          variant="solid"
-          onClose={() => setOpenSnackbar(false)}
-        >
-          Email ou mot de passe incorrect.
-        </Alert>
+        <Alert>Email ou mot de passe incorrect.</Alert>
       </Snackbar>
-      <NeatBackground />
+      {!authenticated && <NeatBackground />}
     </CssVarsProvider>
   );
 }

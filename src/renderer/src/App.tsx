@@ -5,7 +5,7 @@ import Dashboard from "./dashboard/App";
 import User from "./user/App";
 
 const router = createBrowserRouter([
-  { path: "/", element: <Login /> },
+  { path: "*", element: <Login /> },
   { path: "/login", element: <Login /> },
   { path: "/inscription", element: <Inscription /> },
   { path: "/dashboard", element: <Dashboard /> },
