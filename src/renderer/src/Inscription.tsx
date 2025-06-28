@@ -15,6 +15,8 @@ import Stack from "@mui/joy/Stack";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import TT_Logo from "./assets/TT_Logo.svg";
+import Snackbar from "@mui/joy/Snackbar";
+import Alert from "@mui/joy/Alert";
 
 function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
   const { onClick, ...other } = props;
@@ -48,6 +50,42 @@ const customTheme = extendTheme({
 });
 
 export default function JoySignInSideTemplate(): React.ReactElement {
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const addUser = async (
+    event: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = {
+      matricule: Number((formData.get("matricule") as string)?.trim()),
+      login: (formData.get("login") as string)?.trim(),
+      nom: (formData.get("nomPrenom") as string)?.trim(),
+      email: (formData.get("email") as string)?.trim(),
+      adresse: (formData.get("adresse") as string)?.trim(),
+      mot_de_passe: (formData.get("password") as string)?.trim(),
+    };
+
+    try {
+      const res = await window.api.addUser(data);
+      // If your backend returns a success flag, you can check it here
+      if (res && res.success === false && res.message) {
+        setOpenSnackbar(true);
+      }
+      // ...existing code...
+    } catch (error: any) {
+      // Show snackbar if error is about user already existing
+      if (
+        typeof error?.message === "string" &&
+        (error.message.includes("constraint failed") ||
+          error.message.includes("already exists"))
+      ) {
+        setOpenSnackbar(true);
+      }
+      console.error("Failed to add user:", error);
+    }
+  };
+
   return (
     <CssVarsProvider theme={customTheme} disableTransitionOnChange>
       <CssBaseline />
@@ -146,21 +184,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
               </Stack>
             </Stack>
 
-            <form
-              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-                event.preventDefault();
-                const formData = new FormData(event.currentTarget);
-                const data = {
-                  nomPrenom: formData.get("nomPrenom"),
-                  matricule: formData.get("matricule"),
-                  login: formData.get("login"),
-                  email: formData.get("email"),
-                  adresse: formData.get("adresse"),
-                  password: formData.get("password"),
-                };
-                alert(JSON.stringify(data, null, 2));
-              }}
-            >
+            <form onSubmit={addUser}>
               <FormControl required>
                 <FormLabel>Matricule</FormLabel>
                 <Input type="text" name="matricule" />
@@ -203,6 +227,22 @@ export default function JoySignInSideTemplate(): React.ReactElement {
         </Box>
       </Box>
       <NeatBackground />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          width: "100%",
+          maxWidth: 400,
+          fontSize: "0.875rem",
+          zIndex: 10005,
+        }}
+      >
+        <Alert color="danger" variant="solid">
+          Un utilisateur avec ce login/email/matricule existe déjà.
+        </Alert>
+      </Snackbar>
     </CssVarsProvider>
   );
 }
