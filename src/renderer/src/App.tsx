@@ -2,7 +2,7 @@ import Login from "./Login";
 import Inscription from "./Inscription";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Dashboard from "./dashboard/App";
-import User from "./User";
+import User from "./user/App";
 
 const router = createBrowserRouter([
   { path: "/", element: <Login /> },
