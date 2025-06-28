@@ -107,7 +107,6 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           right: 0,
           top: 0,
           bottom: 0,
-          zIndex: 10001,
           display: "flex",
           justifyContent: "flex-end",
           backdropFilter: "blur(30px)",
@@ -238,7 +237,6 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           width: "100%",
           maxWidth: 422,
           fontSize: "1rem",
-          zIndex: 10005,
         }}
       >
         <Alert>
