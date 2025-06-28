@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { CssVarsProvider } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
@@ -46,7 +45,7 @@ export default function JoyOrderDashboardTemplate() {
             <Breadcrumbs
               size="sm"
               aria-label="breadcrumbs"
-              separator={<ChevronRightRoundedIcon fontSize="sm" />}
+              separator={<ChevronRightRoundedIcon />}
               sx={{ pl: 0 }}
             >
               <Link
@@ -66,7 +65,7 @@ export default function JoyOrderDashboardTemplate() {
                 Dashboard
               </Link>
               <Typography color="primary" sx={{ fontWeight: 500, fontSize: 12 }}>
-                Orders
+                Gestion des tickets
               </Typography>
             </Breadcrumbs>
           </Box>
@@ -82,7 +81,7 @@ export default function JoyOrderDashboardTemplate() {
             }}
           >
             <Typography level="h2" component="h1">
-              Orders
+              Gestion des tickets
             </Typography>
             <Button
               color="primary"
