@@ -13,9 +13,26 @@ db.prepare(
   nom TEXT NOT NULL,
   email TEXT NOT NULL,
   adresse TEXT NOT NULL,
-  mot_de_passe TEXT NOT NULL
+  mot_de_passe TEXT NOT NULL,
+  role TEXT DEFAULT 'user'
 );`
 ).run();
+
+// Check if there are any users, and if not, insert a default admin user
+const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get().count;
+if (userCount === 0) {
+  db.prepare(
+    "INSERT INTO users (matricule, login, nom, email, adresse, mot_de_passe, role) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  ).run(
+    1,
+    "admin",
+    "Administrateur",
+    "admin@admin.com",
+    "Adresse Admin",
+    "admin", // You may want to hash this in production
+    "admin"
+  );
+}
 
 ipcMain.handle("get-users", () => db.prepare("SELECT * FROM users").all());
 ipcMain.handle("get-user-by-email", (_e, email: string) =>

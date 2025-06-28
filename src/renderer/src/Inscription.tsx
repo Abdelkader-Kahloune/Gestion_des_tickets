@@ -229,18 +229,18 @@ export default function JoySignInSideTemplate(): React.ReactElement {
       <NeatBackground />
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={4000}
+        autoHideDuration={2000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         sx={{
           width: "100%",
-          maxWidth: 400,
-          fontSize: "0.875rem",
+          maxWidth: 422,
+          fontSize: "1rem",
           zIndex: 10005,
         }}
       >
-        <Alert color="danger" variant="solid">
-          Un utilisateur avec ce login/email/matricule existe déjà.
+        <Alert>
+          Un utilisateur avec ce login, email ou matricule existe déjà.
         </Alert>
       </Snackbar>
     </CssVarsProvider>
