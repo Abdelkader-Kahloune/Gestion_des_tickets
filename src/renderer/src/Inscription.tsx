@@ -152,6 +152,8 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                 const formData = new FormData(event.currentTarget);
                 const data = {
                   nomPrenom: formData.get("nomPrenom"),
+                  matricule: formData.get("matricule"),
+                  login: formData.get("login"),
                   email: formData.get("email"),
                   adresse: formData.get("adresse"),
                   password: formData.get("password"),
@@ -160,9 +162,20 @@ export default function JoySignInSideTemplate(): React.ReactElement {
               }}
             >
               <FormControl required>
+                <FormLabel>Matricule</FormLabel>
+                <Input type="text" name="matricule" />
+              </FormControl>
+
+              <FormControl required>
+                <FormLabel>Login</FormLabel>
+                <Input type="text" name="login" />
+              </FormControl>
+
+              <FormControl required>
                 <FormLabel>Nom & Prénom</FormLabel>
                 <Input type="text" name="nomPrenom" />
               </FormControl>
+
               <FormControl required>
                 <FormLabel>Email</FormLabel>
                 <Input type="email" name="email" />

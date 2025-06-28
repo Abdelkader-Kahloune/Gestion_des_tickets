@@ -18,4 +18,3 @@ if (process.contextIsolated) {
   // @ts-ignore
   window.api = api;
 }
-type

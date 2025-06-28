@@ -9,7 +9,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/inscription", element: <Inscription /> },
   { path: "/dashboard", element: <Dashboard /> },
-  { path:"/user/:id", element:<User/> }
+  { path: "/user/:id", element: <User /> },
   //{path:"/user/:id",element:<User/>}//cosnt id = useParams(),
 ]);
 function App(): React.JSX.Element {
