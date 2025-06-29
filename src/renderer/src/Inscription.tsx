@@ -15,6 +15,9 @@ import Stack from "@mui/joy/Stack";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import TT_Logo from "./assets/TT_Logo.svg";
+import Snackbar from "@mui/joy/Snackbar";
+import Alert from "@mui/joy/Alert";
+import { useNavigate } from "react-router-dom";
 
 function ColorSchemeToggle(props: IconButtonProps): React.ReactElement {
   const { onClick, ...other } = props;
@@ -48,6 +51,42 @@ const customTheme = extendTheme({
 });
 
 export default function JoySignInSideTemplate(): React.ReactElement {
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const navigate = useNavigate();
+
+  const addUser = async (
+    event: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = {
+      matricule: Number((formData.get("matricule") as string)?.trim()),
+      login: (formData.get("login") as string)?.trim(),
+      nom: (formData.get("nomPrenom") as string)?.trim(),
+      email: (formData.get("email") as string)?.trim(),
+      adresse: (formData.get("adresse") as string)?.trim(),
+      mot_de_passe: (formData.get("password") as string)?.trim(),
+    };
+
+    try {
+      const res = await window.api.addUser(data);
+      if (res && res.success === false && res.message) {
+        setOpenSnackbar(true);
+      } else {
+        navigate(`/user/${data.matricule}`);
+      }
+    } catch (error: any) {
+      if (
+        typeof error?.message === "string" &&
+        (error.message.includes("constraint failed") ||
+          error.message.includes("already exists"))
+      ) {
+        setOpenSnackbar(true);
+      }
+      console.error("Failed to add user:", error);
+    }
+  };
+
   return (
     <CssVarsProvider theme={customTheme} disableTransitionOnChange>
       <CssBaseline />
@@ -146,21 +185,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
               </Stack>
             </Stack>
 
-            <form
-              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-                event.preventDefault();
-                const formData = new FormData(event.currentTarget);
-                const data = {
-                  nomPrenom: formData.get("nomPrenom"),
-                  matricule: formData.get("matricule"),
-                  login: formData.get("login"),
-                  email: formData.get("email"),
-                  adresse: formData.get("adresse"),
-                  password: formData.get("password"),
-                };
-                alert(JSON.stringify(data, null, 2));
-              }}
-            >
+            <form onSubmit={addUser}>
               <FormControl required>
                 <FormLabel>Matricule</FormLabel>
                 <Input type="text" name="matricule" />
@@ -202,6 +227,24 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           </Box>
         </Box>
       </Box>
+      {/* Only show NeatBackground if not redirected/authenticated */}
+      {/* You can use a state to track if navigation happened, but since navigate() unmounts this component, this is enough */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          width: "100%",
+          maxWidth: 422,
+          fontSize: "1rem",
+          zIndex: 10005,
+        }}
+      >
+        <Alert>
+          Un utilisateur avec ce login, email ou matricule existe déjà.
+        </Alert>
+      </Snackbar>
       <NeatBackground />
     </CssVarsProvider>
   );

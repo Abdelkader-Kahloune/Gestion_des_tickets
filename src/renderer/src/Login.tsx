@@ -16,6 +16,9 @@ import Stack from "@mui/joy/Stack";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import TT_Logo from "./assets/TT_Logo.svg";
+import Snackbar from "@mui/joy/Snackbar";
+import Alert from "@mui/joy/Alert";
+import { useNavigate } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -58,6 +61,10 @@ const customTheme = extendTheme({
 });
 
 export default function JoySignInSideTemplate(): React.ReactElement {
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [authenticated, setAuthenticated] = React.useState(false);
+  const navigate = useNavigate();
+
   return (
     <CssVarsProvider theme={customTheme} disableTransitionOnChange>
       <CssBaseline />
@@ -157,14 +164,27 @@ export default function JoySignInSideTemplate(): React.ReactElement {
             </Stack>
 
             <form
-              onSubmit={(event: React.FormEvent<SignInFormElement>) => {
+              onSubmit={async (event: React.FormEvent<SignInFormElement>) => {
                 event.preventDefault();
                 const formData = new FormData(event.currentTarget);
-                const data = {
-                  email: formData.get("email"),
-                  password: formData.get("password"),
-                };
-                alert(JSON.stringify(data, null, 2));
+                const email = (formData.get("email") as string)?.trim();
+                const password = (formData.get("password") as string)?.trim();
+
+                try {
+                  const user = await window.api.getUserByEmail(email);
+                  if (!user || user.mot_de_passe !== password) {
+                    setOpenSnackbar(true);
+                  } else {
+                    setAuthenticated(true);
+                    if (user.role === "admin") {
+                      navigate("/dashboard");
+                    } else {
+                      navigate(`/user/${user.matricule}`);
+                    }
+                  }
+                } catch (error) {
+                  setOpenSnackbar(true);
+                }
               }}
             >
               <FormControl required>
@@ -200,7 +220,21 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           </Box>
         </Box>
       </Box>
-      <NeatBackground />
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          fontSize: "1rem",
+          zIndex: 10005,
+          width: "100%",
+          maxWidth: 100,
+        }}
+      >
+        <Alert>Email ou mot de passe incorrect.</Alert>
+      </Snackbar>
+      {!authenticated && <NeatBackground />}
     </CssVarsProvider>
   );
 }

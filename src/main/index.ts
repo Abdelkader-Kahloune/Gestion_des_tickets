@@ -5,24 +5,80 @@ import icon from "../../resources/icon.png?asset";
 import Database from "better-sqlite3";
 import path from "path";
 
-const db = new Database(path.join(app.getPath("userData"), "app.db"));
+const db = new Database(path.join(app.getPath("userData"), "user.db"));
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY,
-  name TEXT
-)`
+  matricule INTEGER PRIMARY KEY,
+  login TEXT NOT NULL,
+  nom TEXT NOT NULL,
+  email TEXT NOT NULL,
+  adresse TEXT NOT NULL,
+  mot_de_passe TEXT NOT NULL,
+  role TEXT DEFAULT 'user'
+);`
 ).run();
 
+// Check if there are any users, and if not, insert a default admin user
+const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get().count;
+if (userCount === 0) {
+  db.prepare(
+    "INSERT INTO users (matricule, login, nom, email, adresse, mot_de_passe, role) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  ).run(
+    1,
+    "admin",
+    "Administrateur",
+    "admin@admin.com",
+    "Adresse Admin",
+    "admin", // You may want to hash this in production
+    "admin"
+  );
+}
+
 ipcMain.handle("get-users", () => db.prepare("SELECT * FROM users").all());
-ipcMain.handle("add-user", (_e, name: string) =>
-  db.prepare("INSERT INTO users (name) VALUES (?)").run(name)
+ipcMain.handle("get-user-by-email", (_e, email: string) =>
+  db.prepare("SELECT * FROM users WHERE email = ?").get(email)
 );
-ipcMain.handle("update-user", (_e, id: number, name: string) =>
-  db.prepare("UPDATE users SET name = ? WHERE id = ?").run(name, id)
+ipcMain.handle("get-user-by-id", (_e, matricule: number) =>
+  db.prepare("SELECT * FROM users WHERE matricule = ?").get(matricule)
 );
-ipcMain.handle("delete-user", (_e, id: number) =>
-  db.prepare("DELETE FROM users WHERE id = ?").run(id)
+
+ipcMain.handle(
+  "add-user",
+  (_e, { matricule, login, nom, email, adresse, mot_de_passe }) => {
+    const existingUser = db
+      .prepare("SELECT 1 FROM users WHERE email = ?")
+      .get(email);
+    if (existingUser) {
+      return { success: false, message: "Email already exists." };
+    }
+    try {
+      db.prepare(
+        "INSERT INTO users (matricule,login,nom,email,adresse,mot_de_passe) VALUES (?,?,?,?,?,?)"
+      ).run(matricule, login, nom, email, adresse, mot_de_passe);
+      return { success: true, message: "User added successfully." };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Failed to add user.",
+        error: error.message,
+      };
+    }
+  }
 );
+
+ipcMain.handle(
+  "update-user",
+  (_e, { matricule, login, nom, email, adresse, mot_de_passe }) =>
+    db
+      .prepare(
+        "UPDATE users SET  login=? nom=? email=? adresse=? mot_de_passe=?  WHERE matricule = ?"
+      )
+      .run(login, nom, email, adresse, mot_de_passe, matricule)
+);
+ipcMain.handle("delete-user", (_e, matricule: number) =>
+  db.prepare("DELETE FROM users WHERE matricule = ?").run(matricule)
+);
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
