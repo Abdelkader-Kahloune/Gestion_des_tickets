@@ -12,7 +12,6 @@ import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import Sidebar from "./components/Sidebar";
 import OrderTable from "./components/OrderTable";
-import OrderList from "./components/OrderList";
 import Header from "./components/Header";
 
 export default function JoyOrderDashboardTemplate() {
@@ -95,7 +94,6 @@ export default function JoyOrderDashboardTemplate() {
             </Button>
           </Box>
           <OrderTable />
-          <OrderList />
         </Box>
       </Box>
     </CssVarsProvider>

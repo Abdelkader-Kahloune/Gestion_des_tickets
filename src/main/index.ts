@@ -35,6 +35,20 @@ if (userCount === 0) {
   );
 }
 
+// Create tickets table if not exists, with foreign key constraint on matricule (matricule is the id)
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    matricule INTEGER NOT NULL,
+    nomPrenom TEXT NOT NULL,
+    nombre INTEGER NOT NULL,
+    typeTicket TEXT NOT NULL,
+    offre TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (matricule) REFERENCES users(matricule) ON DELETE CASCADE
+  );`
+).run();
+
 ipcMain.handle("get-users", () => db.prepare("SELECT * FROM users").all());
 ipcMain.handle("get-user-by-email", (_e, email: string) =>
   db.prepare("SELECT * FROM users WHERE email = ?").get(email)
@@ -119,6 +133,85 @@ ipcMain.handle("send-password-email", async (_e, email: string) => {
   }
 });
 
+ipcMain.handle("get-tickets", () => db.prepare("SELECT * FROM tickets").all());
+ipcMain.handle("get-tickets-by-matricule", (_e, matricule: number) =>
+  db
+    .prepare(
+      `SELECT tickets.*, users.nom, users.email
+     FROM tickets
+     JOIN users ON tickets.matricule = users.matricule
+     WHERE tickets.matricule = ?`
+    )
+    .all(matricule)
+);
+
+ipcMain.handle("add-ticket", (_e, ticket) => {
+  try {
+    db.prepare(
+      `INSERT INTO tickets (matricule, nomPrenom, nombre, typeTicket, offre) VALUES (?, ?, ?, ?, ?)`
+    ).run(
+      ticket.matricule,
+      ticket.nomPrenom,
+      ticket.nombre,
+      ticket.typeTicket,
+      ticket.offre
+    );
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle("delete-ticket", (_e, matricule: number) => {
+  try {
+    db.prepare("DELETE FROM tickets WHERE matricule = ?").run(matricule);
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
+// Add these handlers after the existing ticket handlers
+
+ipcMain.handle("update-ticket", (_e, ticket) => {
+  try {
+    const result = db
+      .prepare(
+        `UPDATE tickets
+       SET nomPrenom = ?, nombre = ?, typeTicket = ?, offre = ?
+       WHERE id = ?`
+      )
+      .run(
+        ticket.nomPrenom,
+        ticket.nombre,
+        ticket.typeTicket,
+        ticket.offre,
+        ticket.id
+      );
+
+    if (result.changes > 0) {
+      return { success: true };
+    } else {
+      return { success: false, message: "Ticket not found" };
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle("delete-ticket-by-id", (_e, ticketId: number) => {
+  try {
+    const result = db.prepare("DELETE FROM tickets WHERE id = ?").run(ticketId);
+
+    if (result.changes > 0) {
+      return { success: true };
+    } else {
+      return { success: false, message: "Ticket not found" };
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -186,5 +279,7 @@ app.on("window-all-closed", () => {
   }
 });
 
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

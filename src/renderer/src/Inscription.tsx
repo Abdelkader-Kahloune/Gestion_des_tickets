@@ -191,7 +191,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                 </Typography>
                 <Typography level="body-sm">
                   Déjà inscrit?{" "}
-                  <Link href="/login" level="title-sm">
+                  <Link href="/" level="title-sm">
                     Se connecter!
                   </Link>
                 </Typography>

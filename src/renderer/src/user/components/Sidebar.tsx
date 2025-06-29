@@ -9,14 +9,17 @@ import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import ConfirmationNumberRoundedIcon from "@mui/icons-material/ConfirmationNumberRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { closeSidebar } from "../utils";
-import type { FC } from 'react';
+import { useNavigate } from "react-router-dom";
+import type { FC } from "react";
 
-export const Sidebar: FC = () => {
+export const Sidebar: FC<{ id?: string }> = ({ id }) => {
+  const navigate = useNavigate();
+
   return (
     <Sheet
       className="Sidebar"
@@ -69,13 +72,28 @@ export const Sidebar: FC = () => {
         }}
         onClick={() => closeSidebar()}
       />
-      <Box sx={{ position: 'relative', width: '100%' }}>
-        <ColorSchemeToggle sx={{ position: 'absolute', right: 0, top: 0 }} />
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5, mt: 4, mb: 1 }}>
-          <Typography level="title-lg" sx={{ fontWeight: 700, fontSize: 22, lineHeight: 1 }}>
+      <Box sx={{ position: "relative", width: "100%" }}>
+        <ColorSchemeToggle sx={{ position: "absolute", right: 0, top: 0 }} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            mt: 4,
+            mb: 1,
+          }}
+        >
+          <Typography
+            level="title-lg"
+            sx={{ fontWeight: 700, fontSize: 22, lineHeight: 1 }}
+          >
             Tunisie Telecom
           </Typography>
-          <Typography level="body-sm" sx={{ fontSize: 13, color: 'text.secondary', fontWeight: 400 }}>
+          <Typography
+            level="body-sm"
+            sx={{ fontSize: 13, color: "text.secondary", fontWeight: 400 }}
+          >
             (Espace Personnel)
           </Typography>
         </Box>
@@ -101,19 +119,19 @@ export const Sidebar: FC = () => {
           }}
         >
           <ListItem>
-            <ListItemButton>
-              <HomeRoundedIcon />
+            <ListItemButton onClick={() => navigate(`/user/${id}`)}>
+              <PersonRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Home</Typography>
+                <Typography level="title-sm">Profile</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
 
           <ListItem>
-            <ListItemButton>
-              <DashboardRoundedIcon />
+            <ListItemButton onClick={() => navigate(`/ticket/${id}`)}>
+              <ConfirmationNumberRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Dashboard</Typography>
+                <Typography level="title-sm">Tickets</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
@@ -130,7 +148,12 @@ export const Sidebar: FC = () => {
           <Typography level="title-sm">Siriwat K.</Typography>
           <Typography level="body-xs">siriwatk@test.com</Typography>
         </Box>
-        <IconButton size="sm" variant="plain" color="neutral">
+        <IconButton
+          size="sm"
+          variant="plain"
+          color="neutral"
+          onClick={() => navigate("login")}
+        >
           <LogoutRoundedIcon />
         </IconButton>
       </Box>

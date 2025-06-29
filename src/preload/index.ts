@@ -32,6 +32,28 @@ const api = {
 
   sendPasswordByEmail: (email: string) =>
     ipcRenderer.invoke("send-password-email", email),
+
+  getTickets: () => ipcRenderer.invoke("get-tickets"),
+  addTicket: (ticket: {
+    matricule: number;
+    nomPrenom: string;
+    nombre: number;
+    typeTicket: string;
+    offre: string;
+  }) => ipcRenderer.invoke("add-ticket", ticket),
+  deleteTicket: (matricule: number) =>
+    ipcRenderer.invoke("delete-ticket", matricule),
+  getTicketsByMatricule: (matricule: number) =>
+    ipcRenderer.invoke("get-tickets-by-matricule", matricule),
+  updateTicket: (ticket: {
+    id: number;
+    nomPrenom: string;
+    nombre: number;
+    typeTicket: string;
+    offre: string;
+  }) => ipcRenderer.invoke("update-ticket", ticket),
+  deleteTicketById: (ticketId: number) =>
+    ipcRenderer.invoke("delete-ticket-by-id", ticketId),
 };
 
 if (process.contextIsolated) {

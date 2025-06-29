@@ -26,6 +26,28 @@ declare global {
       sendPasswordByEmail: (
         email: string
       ) => Promise<{ success: boolean; message?: string }>;
+      getTickets: () => Promise<any[]>;
+      addTicket: (ticket: {
+        matricule: number;
+        nomPrenom: string;
+        nombre: number;
+        typeTicket: string;
+        offre: string;
+      }) => Promise<{ success: boolean; message?: string }>;
+      deleteTicket: (
+        matricule: number
+      ) => Promise<{ success: boolean; message?: string }>;
+      getTicketsByMatricule: (matricule: number) => Promise<any[]>;
+      updateTicket: (ticket: {
+        id: number;
+        nomPrenom: string;
+        nombre: number;
+        typeTicket: string;
+        offre: string;
+      }) => Promise<{ success: boolean; message?: string }>;
+      deleteTicketById: (
+        ticketId: number
+      ) => Promise<{ success: boolean; message?: string }>;
     };
   }
 }
