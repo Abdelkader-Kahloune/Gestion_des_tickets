@@ -1,0 +1,6 @@
+[class*="neat-branding"],
+[class*="neat-logo"],
+.neat-attribution,
+a[href*="neat.firecms.co"] {
+  display: none !important;
+}
