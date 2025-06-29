@@ -29,6 +29,9 @@ const api = {
 
   deleteUser: (matricule: number) =>
     ipcRenderer.invoke("delete-user", matricule),
+
+  sendPasswordByEmail: (email: string) =>
+    ipcRenderer.invoke("send-password-email", email),
 };
 
 if (process.contextIsolated) {

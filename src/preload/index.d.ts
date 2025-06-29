@@ -4,7 +4,7 @@ declare global {
   interface Window {
     electron: ElectronAPI;
     api: {
-      getUsers: () => Promise<any[]>; // You may want to define a User type for better typing
+      getUsers: () => Promise<any[]>;
       getUserById: (matricule: number) => Promise<any | null>;
       getUserByEmail: (email: string) => Promise<any | null>;
       addUser: (userData: {
@@ -23,6 +23,9 @@ declare global {
         mot_de_passe: string;
       }) => Promise<void>;
       deleteUser: (matricule: number) => Promise<void>;
+      sendPasswordByEmail: (
+        email: string
+      ) => Promise<{ success: boolean; message?: string }>;
     };
   }
 }

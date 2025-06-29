@@ -18,6 +18,7 @@ import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import TT_Logo from "./assets/TT_Logo.svg";
 import Snackbar from "@mui/joy/Snackbar";
 import Alert from "@mui/joy/Alert";
+import CircularProgress from "@mui/joy/CircularProgress";
 import { useNavigate } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -62,6 +63,7 @@ const customTheme = extendTheme({
 
 export default function JoySignInSideTemplate(): React.ReactElement {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
   return (
@@ -164,6 +166,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
             <form
               onSubmit={async (event: React.FormEvent<SignInFormElement>) => {
                 event.preventDefault();
+                setLoading(true);
                 const formData = new FormData(event.currentTarget);
                 const email = (formData.get("email") as string)?.trim();
                 const password = (formData.get("password") as string)?.trim();
@@ -172,15 +175,20 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                   const user = await window.api.getUserByEmail(email);
                   if (!user || user.mot_de_passe !== password) {
                     setOpenSnackbar(true);
+                    setLoading(false);
                   } else {
-                    if (user.role === "admin") {
-                      navigate("/dashboard");
-                    } else {
-                      navigate(`/user/${user.matricule}`);
-                    }
+                    setTimeout(() => {
+                      if (user.role === "admin") {
+                        navigate("/dashboard");
+                      } else {
+                        navigate(`/user/${user.matricule}`);
+                      }
+                      setLoading(false);
+                    }, 1000);
                   }
                 } catch (error) {
                   setOpenSnackbar(true);
+                  setLoading(false);
                 }
               }}
             >
@@ -200,12 +208,12 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                     alignItems: "center",
                   }}
                 >
-                  <Link level="title-sm" href="#replace-with-a-link">
+                  <Link level="title-sm" href="mot_de_passe_oublié">
                     Mot de passe oublié?
                   </Link>
                 </Box>
-                <Button type="submit" fullWidth>
-                  Authentifier
+                <Button type="submit" fullWidth disabled={loading}>
+                  {loading ? <CircularProgress size="sm" /> : "Authentifier"}
                 </Button>
               </Stack>
             </form>

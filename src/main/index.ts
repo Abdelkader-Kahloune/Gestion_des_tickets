@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 import Database from "better-sqlite3";
 import path from "path";
+import nodemailer from "nodemailer";
 
 const db = new Database(path.join(app.getPath("userData"), "user.db"));
 db.prepare(
@@ -79,10 +80,49 @@ ipcMain.handle("delete-user", (_e, matricule: number) =>
   db.prepare("DELETE FROM users WHERE matricule = ?").run(matricule)
 );
 
+ipcMain.handle("send-password-email", async (_e, email: string) => {
+  try {
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Generate a temporary password
+    const tempPassword = Math.random().toString(36).slice(-8);
+
+    // Update the user's password in the database
+    db.prepare("UPDATE users SET mot_de_passe = ? WHERE email = ?").run(
+      tempPassword,
+      email
+    );
+
+    // Configure nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com",
+        pass: "your-app-password",
+      },
+    });
+
+    // Send the email
+    await transporter.sendMail({
+      from: "your-email@gmail.com",
+      to: email,
+      subject: "Votre mot de passe temporaire",
+      text: `Votre mot de passe temporaire est : ${tempPassword}`,
+    });
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
+    width: 1000,
     height: 670,
     show: false,
     autoHideMenuBar: true,
