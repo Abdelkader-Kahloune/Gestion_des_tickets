@@ -1,6 +1,5 @@
 import Table from "@mui/joy/Table";
 import Box from "@mui/joy/Box";
-import Link from "@mui/joy/Link";
 import Button from "@mui/joy/Button";
 import Modal from "@mui/joy/Modal";
 import ModalClose from "@mui/joy/ModalClose";
@@ -153,61 +152,66 @@ export default function OrderTable() {
 
   return (
     <>
-      <Table
-        aria-labelledby="tableTitle"
-        stickyHeader
-        hoverRow
-        sx={{
-          "--TableCell-headBackground": "var(--joy-palette-background-level1)",
-          "--Table-headerUnderlineThickness": "1px",
-          "--TableRow-hoverBackground": "var(--joy-palette-background-level1)",
-          "--TableCell-paddingY": "4px",
-          "--TableCell-paddingX": "8px",
-          minWidth: 900,
-        }}
-      >
-        <thead>
-          <tr>
-            <th style={{ width: 120, padding: "12px 6px" }}>Matricule</th>
-            <th style={{ width: 180, padding: "12px 6px" }}>Nom & Prénom</th>
-            <th style={{ width: 80, padding: "12px 6px" }}>Nombre</th>
-            <th style={{ width: 160, padding: "12px 6px" }}>Type de Ticket</th>
-            <th style={{ width: 160, padding: "12px 6px" }}>Restauration</th>
-            <th style={{ width: 120, padding: "12px 6px" }}>Offre</th>
-            <th style={{ width: 160, padding: "12px 6px" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td>{row.matricule}</td>
-              <td>{row.nomPrenom}</td>
-              <td>{row.nombre}</td>
-              <td>{row.typeTicket}</td>
-              <td>{row.restauration || ""}</td>
-              <td>{row.offre}</td>
-              <td>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Link
-                    component="button"
-                    sx={{ color: "#d32f2f", fontSize: "sm" }}
-                    onClick={() => handleDeleteClick(row)}
-                  >
-                    Supprimer
-                  </Link>
-                  <Link
-                    component="button"
-                    sx={{ color: "#1976d2", fontSize: "sm" }}
-                    onClick={() => handleEditClick(row)}
-                  >
-                    Modifier
-                  </Link>
-                </Box>
-              </td>
+      <Box sx={{ overflowX: "auto" }}>
+        <Table hoverRow>
+          <thead>
+            <tr>
+              <th>Matricule</th>
+              <th>Nom & Prénom</th>
+              <th>Nombre</th>
+              <th>Type de Ticket</th>
+              <th>Restauration</th>
+              <th>Offre</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.id}>
+                <td>{row.matricule}</td>
+                <td>{row.nomPrenom}</td>
+                <td>{row.nombre}</td>
+                <td>
+                  <Typography
+                    level="body-sm"
+                    color={
+                      row.typeTicket === "subventionne" ? "success" : "warning"
+                    }
+                  >
+                    {row.typeTicket === "subventionne"
+                      ? "Subventionné"
+                      : "Non subventionné"}
+                  </Typography>
+                </td>
+                <td>{row.restauration || ""}</td>
+                <td>{row.offre}</td>
+                <td>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleEditClick(row)}
+                      disabled={loading}
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      color="danger"
+                      onClick={() => handleDeleteClick(row)}
+                      disabled={loading}
+                    >
+                      Supprimer
+                    </Button>
+                  </Stack>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
 
       {/* Delete Confirmation Modal */}
       <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
