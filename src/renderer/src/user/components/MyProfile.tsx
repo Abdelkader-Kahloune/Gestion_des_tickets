@@ -52,14 +52,17 @@ export default function MyProfile(): React.ReactElement {
           py: { xs: 2, md: 3 },
         }}
       >
+        {/* Personal Info */}
         <Card>
           <Box sx={{ mb: 1 }}>
             <Typography level="title-md">Personal info</Typography>
             <Typography level="body-sm">
-              Customize how your profile information will apper to the networks.
+              Customize how your profile information will appear to the networks.
             </Typography>
           </Box>
           <Divider />
+
+          {/* Desktop layout */}
           <Stack
             direction="row"
             spacing={3}
@@ -75,7 +78,7 @@ export default function MyProfile(): React.ReactElement {
                   src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
                   srcSet="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286&dpr=2 2x"
                   loading="lazy"
-                  alt=""
+                  alt="Profile"
                 />
               </AspectRatio>
               <IconButton
@@ -96,21 +99,15 @@ export default function MyProfile(): React.ReactElement {
                 <EditRoundedIcon />
               </IconButton>
             </Stack>
+
             <Stack spacing={2} sx={{ flexGrow: 1 }}>
               <Stack spacing={1}>
                 <FormLabel>Name</FormLabel>
                 <FormControl
-                  sx={{
-                    display: { sm: "flex-column", md: "flex-row" },
-                    gap: 2,
-                  }}
+                  sx={{ display: { sm: "flex-column", md: "flex-row" }, gap: 2 }}
                 >
                   <Input size="sm" placeholder="First name" />
-                  <Input
-                    size="sm"
-                    placeholder="Last name"
-                    sx={{ flexGrow: 1 }}
-                  />
+                  <Input size="sm" placeholder="Last name" sx={{ flexGrow: 1 }} />
                 </FormControl>
               </Stack>
               <Stack direction="row" spacing={2}>
@@ -124,37 +121,37 @@ export default function MyProfile(): React.ReactElement {
                     size="sm"
                     type="email"
                     startDecorator={<EmailRoundedIcon />}
-                    placeholder="email"
                     defaultValue="siriwatk@test.com"
+                    placeholder="Email"
                     sx={{ flexGrow: 1 }}
                   />
                 </FormControl>
               </Stack>
-              <div>
-                <FormControl sx={{ display: { sm: "contents" } }}>
-                  <FormLabel>Timezone</FormLabel>
-                  <Select
-                    size="sm"
-                    startDecorator={<AccessTimeFilledRoundedIcon />}
-                    defaultValue="1"
-                  >
-                    <Option value="1">
-                      Indochina Time (Bangkok){" "}
-                      <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
-                        — GMT+07:00
-                      </Typography>
-                    </Option>
-                    <Option value="2">
-                      Indochina Time (Ho Chi Minh City){" "}
-                      <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
-                        — GMT+07:00
-                      </Typography>
-                    </Option>
-                  </Select>
-                </FormControl>
-              </div>
+              <FormControl sx={{ display: { sm: "contents" } }}>
+                <FormLabel>Timezone</FormLabel>
+                <Select
+                  size="sm"
+                  startDecorator={<AccessTimeFilledRoundedIcon />}
+                  defaultValue="1"
+                >
+                  <Option value="1">
+                    Indochina Time (Bangkok)
+                    <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
+                      — GMT+07:00
+                    </Typography>
+                  </Option>
+                  <Option value="2">
+                    Indochina Time (Ho Chi Minh City)
+                    <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
+                      — GMT+07:00
+                    </Typography>
+                  </Option>
+                </Select>
+              </FormControl>
             </Stack>
           </Stack>
+
+          {/* Mobile layout */}
           <Stack
             direction="column"
             spacing={2}
@@ -171,7 +168,7 @@ export default function MyProfile(): React.ReactElement {
                     src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
                     srcSet="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286&dpr=2 2x"
                     loading="lazy"
-                    alt=""
+                    alt="Profile"
                   />
                 </AspectRatio>
                 <IconButton
@@ -195,13 +192,7 @@ export default function MyProfile(): React.ReactElement {
               <Stack spacing={1} sx={{ flexGrow: 1 }}>
                 <FormLabel>Name</FormLabel>
                 <FormControl
-                  sx={{
-                    display: {
-                      sm: "flex-column",
-                      md: "flex-row",
-                    },
-                    gap: 2,
-                  }}
+                  sx={{ display: { sm: "flex-column", md: "flex-row" }, gap: 2 }}
                 >
                   <Input size="sm" placeholder="First name" />
                   <Input size="sm" placeholder="Last name" />
@@ -218,35 +209,34 @@ export default function MyProfile(): React.ReactElement {
                 size="sm"
                 type="email"
                 startDecorator={<EmailRoundedIcon />}
-                placeholder="email"
                 defaultValue="siriwatk@test.com"
+                placeholder="Email"
                 sx={{ flexGrow: 1 }}
               />
             </FormControl>
-            <div>
-              <FormControl sx={{ display: { sm: "contents" } }}>
-                <FormLabel>Timezone</FormLabel>
-                <Select
-                  size="sm"
-                  startDecorator={<AccessTimeFilledRoundedIcon />}
-                  defaultValue="1"
-                >
-                  <Option value="1">
-                    Indochina Time (Bangkok){" "}
-                    <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
-                      — GMT+07:00
-                    </Typography>
-                  </Option>
-                  <Option value="2">
-                    Indochina Time (Ho Chi Minh City){" "}
-                    <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
-                      — GMT+07:00
-                    </Typography>
-                  </Option>
-                </Select>
-              </FormControl>
-            </div>
+            <FormControl sx={{ display: { sm: "contents" } }}>
+              <FormLabel>Timezone</FormLabel>
+              <Select
+                size="sm"
+                startDecorator={<AccessTimeFilledRoundedIcon />}
+                defaultValue="1"
+              >
+                <Option value="1">
+                  Indochina Time (Bangkok)
+                  <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
+                    — GMT+07:00
+                  </Typography>
+                </Option>
+                <Option value="2">
+                  Indochina Time (Ho Chi Minh City)
+                  <Typography textColor="text.tertiary" sx={{ ml: 0.5 }}>
+                    — GMT+07:00
+                  </Typography>
+                </Option>
+              </Select>
+            </FormControl>
           </Stack>
+
           <CardOverflow sx={{ borderTop: "1px solid", borderColor: "divider" }}>
             <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
               <Button size="sm" variant="outlined" color="neutral">
@@ -258,6 +248,8 @@ export default function MyProfile(): React.ReactElement {
             </CardActions>
           </CardOverflow>
         </Card>
+
+        {/* Bio Section */}
         <Card>
           <Box sx={{ mb: 1 }}>
             <Typography level="title-md">Bio</Typography>
@@ -288,6 +280,8 @@ export default function MyProfile(): React.ReactElement {
             </CardActions>
           </CardOverflow>
         </Card>
+
+        {/* Portfolio Section */}
         <Card>
           <Box sx={{ mb: 1 }}>
             <Typography level="title-md">Portfolio projects</Typography>
@@ -296,7 +290,6 @@ export default function MyProfile(): React.ReactElement {
             </Typography>
           </Box>
           <Divider />
-
           <CardOverflow sx={{ borderTop: "1px solid", borderColor: "divider" }}>
             <CardActions sx={{ alignSelf: "flex-end", pt: 2 }}>
               <Button size="sm" variant="outlined" color="neutral">
