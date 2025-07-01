@@ -179,7 +179,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                   } else {
                     setTimeout(() => {
                       if (user.role === "admin") {
-                        navigate("/dashboard");
+                        navigate("/ticket-table");
                       } else {
                         navigate(`/user/${user.matricule}`);
                       }

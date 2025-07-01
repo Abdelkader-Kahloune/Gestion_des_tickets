@@ -283,3 +283,27 @@ app.on("window-all-closed", () => {
 // code. You can also put them in separate files and require them here.
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+// Replace your current image generation code with this:
+import { generatePixelAnimalImage } from "./modules/img_gen";
+
+async function handleImageGeneration() {
+  try {
+    // Use proper paths - input image from resources, output to user data
+    const inputImagePath = path.join(__dirname, "../../resources/img.png"); // Adjust path as needed
+    const outputDir = path.join(app.getPath("userData"), "generated_images");
+
+    const savedFiles = await generatePixelAnimalImage(
+      inputImagePath,
+      outputDir
+    );
+    console.log("Image generation completed!", savedFiles);
+    return { success: true, files: savedFiles };
+  } catch (error) {
+    console.error("Failed to generate image:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+ipcMain.handle("generate-pixel-animal", async (_e) => {
+  return await handleImageGeneration();
+});
