@@ -86,7 +86,7 @@ ipcMain.handle(
   (_e, { matricule, login, nom, email, adresse, mot_de_passe }) =>
     db
       .prepare(
-        "UPDATE users SET  login=? nom=? email=? adresse=? mot_de_passe=?  WHERE matricule = ?"
+        "UPDATE users SET login=?, nom=?, email=?, adresse=?, mot_de_passe=? WHERE matricule = ?"
       )
       .run(login, nom, email, adresse, mot_de_passe, matricule)
 );

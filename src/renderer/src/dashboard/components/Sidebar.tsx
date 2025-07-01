@@ -1,4 +1,3 @@
-import * as React from "react";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -14,13 +13,31 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { closeSidebar } from "../utils";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [userData, setUserData] = useState({ nom: "", email: "" });
+
+  useEffect(() => {
+    const getUser = async (): Promise<void> => {
+      const user = await window.api.getUserById(1);
+      const { email, nom } = user;
+      setUserData({ email, nom });
+    };
+    getUser();
+  }, []);
+
+  // Helper function to check if a path is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <Sheet
       className="Sidebar"
@@ -98,7 +115,10 @@ export default function Sidebar() {
           }}
         >
           <ListItem>
-            <ListItemButton>
+            <ListItemButton
+              selected={isActive("/") || isActive("/home")}
+              onClick={() => navigate("/ticket-table")}
+            >
               <HomeRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Home</Typography>
@@ -107,7 +127,10 @@ export default function Sidebar() {
           </ListItem>
 
           <ListItem>
-            <ListItemButton selected>
+            <ListItemButton
+              selected={isActive("/ticket-table")}
+              onClick={() => navigate("/ticket-table")}
+            >
               <DashboardRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Dashboard</Typography>
@@ -116,7 +139,10 @@ export default function Sidebar() {
           </ListItem>
 
           <ListItem>
-            <ListItemButton>
+            <ListItemButton
+              selected={isActive("/personnel-table")}
+              onClick={() => navigate("/personnel-table")}
+            >
               <GroupRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">
@@ -135,8 +161,8 @@ export default function Sidebar() {
           src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
         />
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography level="title-sm">Admin Tunisie Telecom</Typography>
-          <Typography level="body-xs">Adminadmouna@test.com</Typography>
+          <Typography level="title-sm">{userData.nom}</Typography>
+          <Typography level="body-xs">{userData.email}</Typography>
         </Box>
         <IconButton
           size="sm"
