@@ -168,6 +168,9 @@ export default function OrderTablePersonnel() {
   return (
     <>
       <Box sx={{ overflowX: "auto" }}>
+        <Typography level="h4" sx={{ mb: 2 }}>
+          Gestion des personnels TT
+        </Typography>
         <Table hoverRow>
           <thead>
             <tr>
