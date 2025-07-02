@@ -35,7 +35,15 @@ if (userCount === 0) {
   );
 }
 
-// Create tickets table if not exists, with foreign key constraint on matricule (matricule is the id)
+// Create restoration table first (no foreign key dependencies)
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS restoration (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL UNIQUE
+  );`
+).run();
+
+// Create tickets table with foreign key constraint on matricule and restoration_id
 db.prepare(
   `CREATE TABLE IF NOT EXISTS tickets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,11 +52,35 @@ db.prepare(
     nombre INTEGER NOT NULL,
     typeTicket TEXT NOT NULL,
     offre TEXT NOT NULL,
+    restoration TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (matricule) REFERENCES users(matricule) ON DELETE CASCADE
   );`
 ).run();
 
+// Add some default restoration entries if none exist
+const restoCount = db
+  .prepare("SELECT COUNT(*) as count FROM restoration")
+  .get().count;
+if (restoCount === 0) {
+  const defaultRestorations = [
+    "Restaurant A",
+    "Restaurant B",
+    "Cafétéria",
+    "Snack Bar",
+  ];
+  const insertResto = db.prepare("INSERT INTO restoration (nom) VALUES (?)");
+
+  defaultRestorations.forEach((name) => {
+    try {
+      insertResto.run(name);
+    } catch (error) {
+      console.log(`Restaurant ${name} might already exist`);
+    }
+  });
+}
+
+// User handlers
 ipcMain.handle("get-users", () => db.prepare("SELECT * FROM users").all());
 ipcMain.handle("get-user-by-email", (_e, email: string) =>
   db.prepare("SELECT * FROM users WHERE email = ?").get(email)
@@ -111,7 +143,7 @@ ipcMain.handle("send-password-email", async (_e, email: string) => {
     );
 
     // Configure nodemailer transporter
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       service: "gmail",
       auth: {
         user: "your-email@gmail.com",
@@ -133,14 +165,30 @@ ipcMain.handle("send-password-email", async (_e, email: string) => {
   }
 });
 
-ipcMain.handle("get-tickets", () => db.prepare("SELECT * FROM tickets").all());
+// Ticket handlers with proper restoration support
+ipcMain.handle("get-tickets", () => {
+  return db
+    .prepare(
+      `SELECT
+         t.*,
+         r.nom as restoration_name
+       FROM tickets t
+       LEFT JOIN restoration r ON t.restoration = r.nom
+      `
+    )
+    .all();
+});
+
 ipcMain.handle("get-tickets-by-matricule", (_e, matricule: number) =>
   db
     .prepare(
-      `SELECT tickets.*, users.nom, users.email
-     FROM tickets
-     JOIN users ON tickets.matricule = users.matricule
-     WHERE tickets.matricule = ?`
+      `SELECT
+         t.*,
+         r.nom as restoration_name
+       FROM tickets t
+       LEFT JOIN restoration r ON t.restoration = r.nom
+       WHERE t.matricule = ?
+      `
     )
     .all(matricule)
 );
@@ -148,15 +196,44 @@ ipcMain.handle("get-tickets-by-matricule", (_e, matricule: number) =>
 ipcMain.handle("add-ticket", (_e, ticket) => {
   try {
     db.prepare(
-      `INSERT INTO tickets (matricule, nomPrenom, nombre, typeTicket, offre) VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO tickets (matricule, nomPrenom, nombre, typeTicket, offre, restoration)
+       VALUES (?, ?, ?, ?, ?, ?)`
     ).run(
       ticket.matricule,
       ticket.nomPrenom,
       ticket.nombre,
       ticket.typeTicket,
-      ticket.offre
+      ticket.offre,
+      ticket.restoration
     );
     return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle("update-ticket", (_e, ticket) => {
+  try {
+    const result = db
+      .prepare(
+        `UPDATE tickets
+         SET nomPrenom = ?, nombre = ?, typeTicket = ?, offre = ?, restoration = ?
+         WHERE id = ?`
+      )
+      .run(
+        ticket.nomPrenom,
+        ticket.nombre,
+        ticket.typeTicket,
+        ticket.offre,
+        ticket.restoration,
+        ticket.id
+      );
+
+    if (result.changes > 0) {
+      return { success: true };
+    } else {
+      return { success: false, message: "Ticket not found" };
+    }
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -166,34 +243,6 @@ ipcMain.handle("delete-ticket", (_e, matricule: number) => {
   try {
     db.prepare("DELETE FROM tickets WHERE matricule = ?").run(matricule);
     return { success: true };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-});
-
-// Add these handlers after the existing ticket handlers
-
-ipcMain.handle("update-ticket", (_e, ticket) => {
-  try {
-    const result = db
-      .prepare(
-        `UPDATE tickets
-       SET nomPrenom = ?, nombre = ?, typeTicket = ?, offre = ?
-       WHERE id = ?`
-      )
-      .run(
-        ticket.nomPrenom,
-        ticket.nombre,
-        ticket.typeTicket,
-        ticket.offre,
-        ticket.id
-      );
-
-    if (result.changes > 0) {
-      return { success: true };
-    } else {
-      return { success: false, message: "Ticket not found" };
-    }
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -212,6 +261,77 @@ ipcMain.handle("delete-ticket-by-id", (_e, ticketId: number) => {
     return { success: false, message: error.message };
   }
 });
+
+// Restoration CRUD handlers
+ipcMain.handle("get-restorations", () => {
+  try {
+    return db.prepare("SELECT * FROM restoration ORDER BY nom").all();
+  } catch (error) {
+    console.error("Error fetching restorations:", error);
+    return [];
+  }
+});
+
+ipcMain.handle("add-restoration", (_e, resto: { nom: string }) => {
+  try {
+    db.prepare("INSERT INTO restoration (nom) VALUES (?)").run(resto.nom);
+    return { success: true };
+  } catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      return { success: false, message: "Restaurant name already exists" };
+    }
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle(
+  "update-restoration",
+  (_e, resto: { id: number; nom: string }) => {
+    try {
+      const result = db
+        .prepare("UPDATE restoration SET nom = ? WHERE id = ?")
+        .run(resto.nom, resto.id);
+      if (result.changes > 0) {
+        return { success: true };
+      } else {
+        return { success: false, message: "Restoration not found" };
+      }
+    } catch (error) {
+      if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+        return { success: false, message: "Restaurant name already exists" };
+      }
+      return { success: false, message: error.message };
+    }
+  }
+);
+
+ipcMain.handle("delete-restoration", (_e, id: number) => {
+  try {
+    // Check if any tickets are using this restoration
+    const ticketsUsingResto = db
+      .prepare(
+        "SELECT COUNT(*) as count FROM tickets WHERE restoration = (SELECT nom FROM restoration WHERE id = ?)"
+      )
+      .get(id);
+
+    if (ticketsUsingResto.count > 0) {
+      return {
+        success: false,
+        message: `Cannot delete restaurant. ${ticketsUsingResto.count} ticket(s) are using this restaurant.`,
+      };
+    }
+
+    const result = db.prepare("DELETE FROM restoration WHERE id = ?").run(id);
+    if (result.changes > 0) {
+      return { success: true };
+    } else {
+      return { success: false, message: "Restoration not found" };
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -279,17 +399,13 @@ app.on("window-all-closed", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-// Replace your current image generation code with this:
+// Image generation import and handler
 import { generatePixelAnimalImage } from "./modules/img_gen";
 
 async function handleImageGeneration() {
   try {
     // Use proper paths - input image from resources, output to user data
-    const inputImagePath = path.join(__dirname, "../../resources/img.png"); // Adjust path as needed
+    const inputImagePath = path.join(__dirname, "../../resources/img.png");
     const outputDir = path.join(app.getPath("userData"), "generated_images");
 
     const savedFiles = await generatePixelAnimalImage(
