@@ -28,7 +28,7 @@ interface Ticket {
   nombre: number;
   typeTicket: string;
   offre: string;
-  restauration?: string;
+  restoration?: string; // Now stores the restaurant name instead of ID
   created_at: string;
 }
 
@@ -49,7 +49,7 @@ export default function OrderTable() {
     nombre: 1,
     typeTicket: "subventionne",
     offre: "self-service",
-    restauration: "",
+    restoration: "", // Now stores restaurant name
   });
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -72,6 +72,7 @@ export default function OrderTable() {
   const loadTickets = async () => {
     try {
       const tickets = await window.api.getTickets();
+      console.log("Loaded tickets:", tickets);
       setRows(tickets);
     } catch (error) {
       console.error("Erreur lors du chargement des tickets:", error);
@@ -81,6 +82,7 @@ export default function OrderTable() {
   const loadRestorations = async () => {
     try {
       const restorationsData = await window.api.getRestorations();
+      console.log("Loaded restorations:", restorationsData);
       setRestorations(restorationsData);
     } catch (error) {
       console.error("Erreur lors du chargement des restaurations:", error);
@@ -98,13 +100,21 @@ export default function OrderTable() {
   };
 
   const handleEditClick = (ticket: Ticket) => {
+    console.log("Editing ticket:", ticket);
     setSelectedTicket(ticket);
     setEditForm({
       nomPrenom: ticket.nomPrenom,
       nombre: ticket.nombre,
       typeTicket: ticket.typeTicket,
       offre: ticket.offre,
-      restauration: ticket.restauration || "",
+      restoration: ticket.restoration || "", // Direct name assignment
+    });
+    console.log("Edit form set to:", {
+      nomPrenom: ticket.nomPrenom,
+      nombre: ticket.nombre,
+      typeTicket: ticket.typeTicket,
+      offre: ticket.offre,
+      restoration: ticket.restoration || "",
     });
     setValidationErrors({});
     setEditModalOpen(true);
@@ -151,25 +161,31 @@ export default function OrderTable() {
   const handleEditSubmit = async () => {
     if (!selectedTicket || !validateEditForm()) return;
 
+    console.log("Submitting edit form:", editForm);
     setLoading(true);
     try {
-      const result = await window.api.updateTicket({
+      const updateData = {
         id: selectedTicket.id,
         nomPrenom: editForm.nomPrenom.trim(),
         nombre: editForm.nombre,
         typeTicket: editForm.typeTicket,
         offre: editForm.offre,
-        restauration: editForm.restauration || undefined,
-      });
+        restoration: editForm.restoration || undefined, // Send restaurant name directly
+      };
+
+      console.log("Update data being sent:", updateData);
+      const result = await window.api.updateTicket(updateData);
+      console.log("Update result:", result);
 
       if (result.success) {
-        loadTickets(); // Refresh the table
+        await loadTickets(); // Refresh the table
         setEditModalOpen(false);
         setSelectedTicket(null);
       } else {
         alert(result.message || "Erreur lors de la modification");
       }
     } catch (error) {
+      console.error("Error updating ticket:", error);
       alert("Erreur lors de la modification");
     } finally {
       setLoading(false);
@@ -192,10 +208,19 @@ export default function OrderTable() {
     }
   };
 
-  const getRestorationName = (restaurationId: string) => {
-    if (!restaurationId) return "Aucune";
-    const resto = restorations.find((r) => r.id.toString() === restaurationId);
-    return resto ? resto.nom : "Inconnu";
+  const handleEditSelectChange = (name: string, value: string | null) => {
+    console.log(`Setting ${name} to:`, value);
+    setEditForm({ ...editForm, [name]: value || "" });
+
+    // Clear validation error for this field
+    if (validationErrors[name]) {
+      setValidationErrors({ ...validationErrors, [name]: "" });
+    }
+  };
+
+  // Simplified - restoration is already stored as name
+  const getRestorationName = (restorationName: string) => {
+    return restorationName || "Aucune";
   };
 
   // Restoration management functions
@@ -206,6 +231,16 @@ export default function OrderTable() {
       errors.nom = "Le nom de la restauration est requis";
     } else if (restorationForm.nom.trim().length < 2) {
       errors.nom = "Le nom doit contenir au moins 2 caractères";
+    }
+
+    // Check for duplicate names when adding/editing
+    const existingRestoration = restorations.find(
+      (r) =>
+        r.nom.toLowerCase() === restorationForm.nom.trim().toLowerCase() &&
+        (!selectedRestoration || r.id !== selectedRestoration.id)
+    );
+    if (existingRestoration) {
+      errors.nom = "Une restauration avec ce nom existe déjà";
     }
 
     setRestorationErrors(errors);
@@ -222,7 +257,7 @@ export default function OrderTable() {
       });
 
       if (result.success) {
-        loadRestorations();
+        await loadRestorations(); // Wait for reload
         setAddRestorationModalOpen(false);
         setRestorationForm({ nom: "" });
         setRestorationErrors({});
@@ -230,9 +265,60 @@ export default function OrderTable() {
         alert(result.message || "Erreur lors de l'ajout de la restauration");
       }
     } catch (error) {
+      console.error("Error adding restoration:", error);
       alert("Erreur lors de l'ajout de la restauration");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Helper function to update all tickets that reference a restaurant name
+  const updateTicketsWithNewRestorationName = async (
+    oldName: string,
+    newName: string
+  ) => {
+    const ticketsToUpdate = rows.filter(
+      (ticket) => ticket.restoration === oldName
+    );
+
+    for (const ticket of ticketsToUpdate) {
+      try {
+        await window.api.updateTicket({
+          id: ticket.id,
+          nomPrenom: ticket.nomPrenom,
+          nombre: ticket.nombre,
+          typeTicket: ticket.typeTicket,
+          offre: ticket.offre,
+          restoration: newName,
+        });
+      } catch (error) {
+        console.error(`Error updating ticket ${ticket.id}:`, error);
+      }
+    }
+  };
+
+  // Helper function to clear restaurant references from tickets
+  const clearRestorationFromTickets = async (restorationName: string) => {
+    const ticketsToUpdate = rows.filter(
+      (ticket) => ticket.restoration === restorationName
+    );
+
+    for (const ticket of ticketsToUpdate) {
+      try {
+        await window.api.updateTicket({
+          id: ticket.id,
+          nomPrenom: ticket.nomPrenom,
+          nombre: ticket.nombre,
+          typeTicket: ticket.typeTicket,
+          offre: ticket.offre,
+          restoration: undefined, // Clear the restaurant
+        });
+      } catch (error) {
+        console.error(
+          `Error clearing restaurant from ticket ${ticket.id}:`,
+          error
+        );
+      }
     }
   };
 
@@ -241,23 +327,46 @@ export default function OrderTable() {
 
     setLoading(true);
     try {
-      const result = await window.api.updateRestoration({
+      const oldName = selectedRestoration.nom;
+      const newName = restorationForm.nom.trim();
+
+      console.log("Updating restoration:", {
         id: selectedRestoration.id,
-        nom: restorationForm.nom.trim(),
+        oldName,
+        newName,
       });
 
+      const result = await window.api.updateRestoration({
+        id: selectedRestoration.id,
+        nom: newName,
+      });
+
+      console.log("Update result:", result);
+
       if (result.success) {
-        loadRestorations();
+        // If restaurant name changed, update all tickets that reference the old name
+        if (oldName !== newName) {
+          await updateTicketsWithNewRestorationName(oldName, newName);
+        }
+
+        // Reload restorations first
+        await loadRestorations();
+        // Then reload tickets to update any references
+        await loadTickets();
+
+        // Close modal and reset form
         setEditRestorationModalOpen(false);
         setSelectedRestoration(null);
         setRestorationForm({ nom: "" });
         setRestorationErrors({});
       } else {
+        console.error("Update failed:", result.message);
         alert(
           result.message || "Erreur lors de la modification de la restauration"
         );
       }
     } catch (error) {
+      console.error("Error updating restoration:", error);
       alert("Erreur lors de la modification de la restauration");
     } finally {
       setLoading(false);
@@ -272,8 +381,11 @@ export default function OrderTable() {
       const result = await window.api.deleteRestoration(selectedRestoration.id);
 
       if (result.success) {
-        loadRestorations();
-        loadTickets(); // Refresh tickets in case any were using this restoration
+        // Update all tickets that reference this restaurant to have no restaurant
+        await clearRestorationFromTickets(selectedRestoration.nom);
+
+        await loadRestorations(); // Wait for reload
+        await loadTickets(); // Refresh tickets to reflect the changes
         setDeleteRestorationModalOpen(false);
         setSelectedRestoration(null);
       } else {
@@ -282,6 +394,7 @@ export default function OrderTable() {
         );
       }
     } catch (error) {
+      console.error("Error deleting restoration:", error);
       alert("Erreur lors de la suppression de la restauration");
     } finally {
       setLoading(false);
@@ -289,6 +402,7 @@ export default function OrderTable() {
   };
 
   const openEditRestorationModal = (restoration: Restoration) => {
+    console.log("Opening edit modal for restoration:", restoration);
     setSelectedRestoration(restoration);
     setRestorationForm({ nom: restoration.nom });
     setRestorationErrors({});
@@ -304,6 +418,18 @@ export default function OrderTable() {
     setRestorationForm({ nom: "" });
     setRestorationErrors({});
     setAddRestorationModalOpen(true);
+  };
+
+  const handleRestorationFormChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setRestorationForm({ nom: value });
+
+    // Clear validation error
+    if (restorationErrors.nom) {
+      setRestorationErrors({ ...restorationErrors, nom: "" });
+    }
   };
 
   return (
@@ -359,10 +485,16 @@ export default function OrderTable() {
                       : "Non subventionné"}
                   </Typography>
                 </td>
-                <td>{getRestorationName(row.restauration || "")}</td>
+                <td>{getRestorationName(row.restoration || "")}</td>
                 <td>
                   <Typography level="body-sm">
-                    {row.offre === "self-service" ? "Self-service" : "Sandwich"}
+                    {row.offre === "self-service"
+                      ? "Self-service"
+                      : row.offre === "sandwich"
+                        ? "Sandwich"
+                        : row.offre === "Sandwitch"
+                          ? "Sandwich"
+                          : row.offre}
                   </Typography>
                 </td>
                 <td>
@@ -495,14 +627,14 @@ export default function OrderTable() {
                 <FormLabel>Restauration :</FormLabel>
                 <Select
                   placeholder="Choisir une restauration"
-                  value={editForm.restauration}
+                  value={editForm.restoration}
                   onChange={(_, value) => {
-                    setEditForm({ ...editForm, restauration: value || "" });
+                    handleEditSelectChange("restauration", value);
                   }}
                 >
                   <Option value="">Aucune</Option>
                   {restorations.map((resto) => (
-                    <Option key={resto.id} value={resto.id.toString()}>
+                    <Option key={resto.id} value={resto.nom}>
                       {resto.nom}
                     </Option>
                   ))}
@@ -651,12 +783,7 @@ export default function OrderTable() {
                 <Input
                   placeholder="Nom de la restauration"
                   value={restorationForm.nom}
-                  onChange={(e) => {
-                    setRestorationForm({ nom: e.target.value });
-                    if (restorationErrors.nom) {
-                      setRestorationErrors({ ...restorationErrors, nom: "" });
-                    }
-                  }}
+                  onChange={handleRestorationFormChange}
                 />
                 {restorationErrors.nom && (
                   <Typography color="danger" level="body-sm">
@@ -702,12 +829,7 @@ export default function OrderTable() {
                 <Input
                   placeholder="Nom de la restauration"
                   value={restorationForm.nom}
-                  onChange={(e) => {
-                    setRestorationForm({ nom: e.target.value });
-                    if (restorationErrors.nom) {
-                      setRestorationErrors({ ...restorationErrors, nom: "" });
-                    }
-                  }}
+                  onChange={handleRestorationFormChange}
                 />
                 {restorationErrors.nom && (
                   <Typography color="danger" level="body-sm">
