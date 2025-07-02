@@ -17,7 +17,6 @@ import Option from "@mui/joy/Option";
 import Stack from "@mui/joy/Stack";
 import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
-import Chip from "@mui/joy/Chip";
 import { useEffect, useState } from "react";
 import { Settings, Plus, Edit, Trash2 } from "lucide-react";
 
@@ -28,7 +27,7 @@ interface Ticket {
   nombre: number;
   typeTicket: string;
   offre: string;
-  restoration?: string; // Now stores the restaurant name instead of ID
+  restoration?: string;
   created_at: string;
 }
 
@@ -49,7 +48,7 @@ export default function OrderTable() {
     nombre: 1,
     typeTicket: "subventionne",
     offre: "self-service",
-    restoration: "", // Now stores restaurant name
+    restoration: "",
   });
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -69,11 +68,64 @@ export default function OrderTable() {
     [key: string]: string;
   }>({});
 
+  // Helper function to get restoration name by ID
+  const getRestorationNameById = (restorationId: string | number): string => {
+    if (!restorationId) return "";
+
+    // If it's already a string (name), return it
+    if (typeof restorationId === "string" && isNaN(Number(restorationId))) {
+      return restorationId;
+    }
+
+    // If it's an ID, find the corresponding name
+    const restoration = restorations.find(
+      (r) => r.id === Number(restorationId)
+    );
+    return restoration ? restoration.nom : "";
+  };
+
+  // Helper function to get restoration ID by name
+  const getRestorationIdByName = (restorationName: string): number | null => {
+    if (!restorationName) return null;
+    const restoration = restorations.find((r) => r.nom === restorationName);
+    return restoration ? restoration.id : null;
+  };
+
   const loadTickets = async () => {
     try {
       const tickets = await window.api.getTickets();
-      console.log("Loaded tickets:", tickets);
-      setRows(tickets);
+      console.log("Raw tickets data:", tickets);
+
+      // Process tickets to ensure restoration field is properly handled
+      const processedTickets = tickets.map((ticket: any) => {
+        let restorationName = "";
+
+        if (ticket.restoration) {
+          // Check if restoration is an ID (number) or name (string)
+          if (
+            typeof ticket.restoration === "number" ||
+            (typeof ticket.restoration === "string" &&
+              !isNaN(Number(ticket.restoration)))
+          ) {
+            // It's an ID, convert to name
+            const restoration = restorations.find(
+              (r) => r.id === Number(ticket.restoration)
+            );
+            restorationName = restoration ? restoration.nom : "";
+          } else {
+            // It's already a name
+            restorationName = ticket.restoration;
+          }
+        }
+
+        return {
+          ...ticket,
+          restoration: restorationName,
+        };
+      });
+
+      console.log("Processed tickets:", processedTickets);
+      setRows(processedTickets);
     } catch (error) {
       console.error("Erreur lors du chargement des tickets:", error);
     }
@@ -89,10 +141,20 @@ export default function OrderTable() {
     }
   };
 
+  // Load restorations first, then tickets
   useEffect(() => {
-    loadTickets();
-    loadRestorations();
+    const loadData = async () => {
+      await loadRestorations();
+    };
+    loadData();
   }, []);
+
+  // Load tickets after restorations are loaded
+  useEffect(() => {
+    if (restorations.length > 0) {
+      loadTickets();
+    }
+  }, [restorations]);
 
   const handleDeleteClick = (ticket: Ticket) => {
     setSelectedTicket(ticket);
@@ -102,20 +164,26 @@ export default function OrderTable() {
   const handleEditClick = (ticket: Ticket) => {
     console.log("Editing ticket:", ticket);
     setSelectedTicket(ticket);
+
+    // Ensure restoration is properly set
+    const restorationValue = ticket.restoration || "";
+
     setEditForm({
       nomPrenom: ticket.nomPrenom,
       nombre: ticket.nombre,
       typeTicket: ticket.typeTicket,
       offre: ticket.offre,
-      restoration: ticket.restoration || "", // Direct name assignment
+      restoration: restorationValue,
     });
+
     console.log("Edit form set to:", {
       nomPrenom: ticket.nomPrenom,
       nombre: ticket.nombre,
       typeTicket: ticket.typeTicket,
       offre: ticket.offre,
-      restoration: ticket.restoration || "",
+      restoration: restorationValue,
     });
+
     setValidationErrors({});
     setEditModalOpen(true);
   };
@@ -127,13 +195,14 @@ export default function OrderTable() {
     try {
       const result = await window.api.deleteTicketById(selectedTicket.id);
       if (result.success) {
-        loadTickets(); // Refresh the table
+        await loadTickets();
         setDeleteModalOpen(false);
         setSelectedTicket(null);
       } else {
         alert(result.message || "Erreur lors de la suppression");
       }
     } catch (error) {
+      console.error("Error deleting ticket:", error);
       alert("Erreur lors de la suppression");
     } finally {
       setLoading(false);
@@ -170,7 +239,7 @@ export default function OrderTable() {
         nombre: editForm.nombre,
         typeTicket: editForm.typeTicket,
         offre: editForm.offre,
-        restoration: editForm.restoration || undefined, // Send restaurant name directly
+        restoration: editForm.restoration || undefined,
       };
 
       console.log("Update data being sent:", updateData);
@@ -178,9 +247,16 @@ export default function OrderTable() {
       console.log("Update result:", result);
 
       if (result.success) {
-        await loadTickets(); // Refresh the table
+        await loadTickets();
         setEditModalOpen(false);
         setSelectedTicket(null);
+        setEditForm({
+          nomPrenom: "",
+          nombre: 1,
+          typeTicket: "subventionne",
+          offre: "self-service",
+          restoration: "",
+        });
       } else {
         alert(result.message || "Erreur lors de la modification");
       }
@@ -202,7 +278,6 @@ export default function OrderTable() {
       setEditForm({ ...editForm, [name]: value });
     }
 
-    // Clear validation error for this field
     if (validationErrors[name]) {
       setValidationErrors({ ...validationErrors, [name]: "" });
     }
@@ -212,15 +287,9 @@ export default function OrderTable() {
     console.log(`Setting ${name} to:`, value);
     setEditForm({ ...editForm, [name]: value || "" });
 
-    // Clear validation error for this field
     if (validationErrors[name]) {
       setValidationErrors({ ...validationErrors, [name]: "" });
     }
-  };
-
-  // Simplified - restoration is already stored as name
-  const getRestorationName = (restorationName: string) => {
-    return restorationName || "Aucune";
   };
 
   // Restoration management functions
@@ -233,7 +302,6 @@ export default function OrderTable() {
       errors.nom = "Le nom doit contenir au moins 2 caractères";
     }
 
-    // Check for duplicate names when adding/editing
     const existingRestoration = restorations.find(
       (r) =>
         r.nom.toLowerCase() === restorationForm.nom.trim().toLowerCase() &&
@@ -257,7 +325,7 @@ export default function OrderTable() {
       });
 
       if (result.success) {
-        await loadRestorations(); // Wait for reload
+        await loadRestorations();
         setAddRestorationModalOpen(false);
         setRestorationForm({ nom: "" });
         setRestorationErrors({});
@@ -272,7 +340,6 @@ export default function OrderTable() {
     }
   };
 
-  // Helper function to update all tickets that reference a restaurant name
   const updateTicketsWithNewRestorationName = async (
     oldName: string,
     newName: string
@@ -297,7 +364,6 @@ export default function OrderTable() {
     }
   };
 
-  // Helper function to clear restaurant references from tickets
   const clearRestorationFromTickets = async (restorationName: string) => {
     const ticketsToUpdate = rows.filter(
       (ticket) => ticket.restoration === restorationName
@@ -311,7 +377,7 @@ export default function OrderTable() {
           nombre: ticket.nombre,
           typeTicket: ticket.typeTicket,
           offre: ticket.offre,
-          restoration: undefined, // Clear the restaurant
+          restoration: undefined,
         });
       } catch (error) {
         console.error(
@@ -344,17 +410,13 @@ export default function OrderTable() {
       console.log("Update result:", result);
 
       if (result.success) {
-        // If restaurant name changed, update all tickets that reference the old name
         if (oldName !== newName) {
           await updateTicketsWithNewRestorationName(oldName, newName);
         }
 
-        // Reload restorations first
         await loadRestorations();
-        // Then reload tickets to update any references
         await loadTickets();
 
-        // Close modal and reset form
         setEditRestorationModalOpen(false);
         setSelectedRestoration(null);
         setRestorationForm({ nom: "" });
@@ -381,11 +443,10 @@ export default function OrderTable() {
       const result = await window.api.deleteRestoration(selectedRestoration.id);
 
       if (result.success) {
-        // Update all tickets that reference this restaurant to have no restaurant
         await clearRestorationFromTickets(selectedRestoration.nom);
+        await loadRestorations();
+        await loadTickets();
 
-        await loadRestorations(); // Wait for reload
-        await loadTickets(); // Refresh tickets to reflect the changes
         setDeleteRestorationModalOpen(false);
         setSelectedRestoration(null);
       } else {
@@ -426,7 +487,6 @@ export default function OrderTable() {
     const value = e.target.value;
     setRestorationForm({ nom: value });
 
-    // Clear validation error
     if (restorationErrors.nom) {
       setRestorationErrors({ ...restorationErrors, nom: "" });
     }
@@ -434,7 +494,6 @@ export default function OrderTable() {
 
   return (
     <>
-      {/* Header with Manage Restorations Button */}
       <Box
         sx={{
           mb: 2,
@@ -485,16 +544,18 @@ export default function OrderTable() {
                       : "Non subventionné"}
                   </Typography>
                 </td>
-                <td>{getRestorationName(row.restoration || "")}</td>
+                <td>
+                  <Typography level="body-sm">
+                    {row.restoration || "Aucune"}
+                  </Typography>
+                </td>
                 <td>
                   <Typography level="body-sm">
                     {row.offre === "self-service"
                       ? "Self-service"
-                      : row.offre === "sandwich"
+                      : row.offre === "sandwich" || row.offre === "Sandwitch"
                         ? "Sandwich"
-                        : row.offre === "Sandwitch"
-                          ? "Sandwich"
-                          : row.offre}
+                        : row.offre}
                   </Typography>
                 </td>
                 <td>
@@ -629,7 +690,8 @@ export default function OrderTable() {
                   placeholder="Choisir une restauration"
                   value={editForm.restoration}
                   onChange={(_, value) => {
-                    handleEditSelectChange("restauration", value);
+                    console.log("Restaurant selected:", value);
+                    handleEditSelectChange("restoration", value);
                   }}
                 >
                   <Option value="">Aucune</Option>

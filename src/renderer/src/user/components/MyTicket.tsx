@@ -30,7 +30,6 @@ interface Ticket {
   typeTicket: string;
   offre: string;
   restoration?: string;
-  dateCreation?: string;
 }
 
 interface Restoration {
@@ -470,7 +469,6 @@ export const MyTicket: FC = () => {
                     <th>Type</th>
                     <th>Offre</th>
                     <th>Restauration</th>
-                    <th>Date</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -500,13 +498,7 @@ export const MyTicket: FC = () => {
                           ? getRestorationName(ticket.restoration)
                           : "-"}
                       </td>
-                      <td>
-                        {ticket.dateCreation
-                          ? new Date(ticket.dateCreation).toLocaleDateString(
-                              "fr-FR"
-                            )
-                          : "-"}
-                      </td>
+
                       <td>
                         <Stack direction="row" spacing={1}>
                           <Button

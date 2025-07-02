@@ -4,10 +4,9 @@ import Box from "@mui/joy/Box";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import MyTicket from "./components/MyTicket";
-import MyProfile from "./components/MyProfile";
 import { useParams } from "react-router-dom"; // Import useParams to access URL parameters
 
-function User() {
+const User = () => {
   const id = useParams().id; // Assuming you want to use the id from the URL params
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -35,5 +34,5 @@ function User() {
       </Box>
     </CssVarsProvider>
   );
-}
+};
 export default User;

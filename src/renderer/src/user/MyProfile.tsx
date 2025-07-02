@@ -3,7 +3,6 @@ import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-import MyTicket from "./components/MyTicket";
 import MyProfile from "./components/MyProfile";
 import { useParams } from "react-router-dom"; // Import useParams to access URL parameters
 
