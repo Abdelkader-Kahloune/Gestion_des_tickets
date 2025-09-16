@@ -1,20 +1,15 @@
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Breadcrumbs from "@mui/joy/Breadcrumbs";
-import Link from "@mui/joy/Link";
 import Typography from "@mui/joy/Typography";
-
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import Sidebar from "./components/Sidebar";
 import OrderTableTicket from "./components/OrderTableTicket";
 import Header from "./components/Header";
 
-export default function JoyOrderDashboardTemplate() {
+import type React from "react";
+
+export default function JoyOrderDashboardTemplate(): React.ReactElement {
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
@@ -40,37 +35,6 @@ export default function JoyOrderDashboardTemplate() {
             gap: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Breadcrumbs
-              size="sm"
-              aria-label="breadcrumbs"
-              separator={<ChevronRightRoundedIcon />}
-              sx={{ pl: 0 }}
-            >
-              <Link
-                underline="none"
-                color="neutral"
-                href="#some-link"
-                aria-label="Home"
-              >
-                <HomeRoundedIcon />
-              </Link>
-              <Link
-                underline="hover"
-                color="neutral"
-                href="#some-link"
-                sx={{ fontSize: 12, fontWeight: 500 }}
-              >
-                Dashboard
-              </Link>
-              <Typography
-                color="primary"
-                sx={{ fontWeight: 500, fontSize: 12 }}
-              >
-                Gestion des tickets
-              </Typography>
-            </Breadcrumbs>
-          </Box>
           <Box
             sx={{
               display: "flex",
@@ -85,13 +49,6 @@ export default function JoyOrderDashboardTemplate() {
             <Typography level="h2" component="h1">
               Gestion des tickets
             </Typography>
-            <Button
-              color="primary"
-              startDecorator={<DownloadRoundedIcon />}
-              size="sm"
-            >
-              Download PDF
-            </Button>
           </Box>
           <OrderTableTicket />
         </Box>

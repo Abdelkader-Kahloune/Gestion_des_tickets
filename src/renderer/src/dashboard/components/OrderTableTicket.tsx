@@ -152,8 +152,22 @@ export default function OrderTable() {
 
   return (
     <>
-      <Box sx={{ overflowX: "auto" }}>
-        <Table hoverRow>
+      <Box sx={{
+          overflowX: "auto",
+          scrollbarWidth: "thin",
+          scrollbarColor: "#9aa4b2 transparent",
+          "&::-webkit-scrollbar": { height: { xs: 6, sm: 8 } },
+          "&::-webkit-scrollbar-track": { background: "transparent" },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#9aa4b2",
+            borderRadius: 9999,
+            border: "2px solid transparent",
+            backgroundClip: "padding-box",
+          },
+          "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "#7b8794" },
+          "&::-webkit-scrollbar-thumb:active": { backgroundColor: "#5f6b7a" },
+        }}>
+                 <Table hoverRow sx={{ width: 'max-content', minWidth: '100%', tableLayout: { xs: 'fixed', md: 'auto' }, '& th, & td': { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', p: 1 } }}>
           <thead>
             <tr>
               <th>Matricule</th>
@@ -162,7 +176,7 @@ export default function OrderTable() {
               <th>Type de Ticket</th>
               <th>Restauration</th>
               <th>Offre</th>
-              <th>Actions</th>
+              <th style={{ width: 160 }}>Actions</th>
             </tr>
           </thead>
           <tbody>

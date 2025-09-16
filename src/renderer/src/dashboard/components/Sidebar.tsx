@@ -9,7 +9,6 @@ import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
@@ -19,7 +18,9 @@ import { useEffect, useState } from "react";
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { closeSidebar } from "../utils";
 
-export default function Sidebar() {
+import type React from "react";
+
+export default function Sidebar(): React.ReactElement {
   const navigate = useNavigate();
   const location = useLocation();
   const [userData, setUserData] = useState({ nom: "", email: "" });
@@ -34,7 +35,7 @@ export default function Sidebar() {
   }, []);
 
   // Helper function to check if a path is active
-  const isActive = (path: string) => {
+  const isActive = (path: string): boolean => {
     return location.pathname === path;
   };
 
@@ -116,24 +117,12 @@ export default function Sidebar() {
         >
           <ListItem>
             <ListItemButton
-              selected={isActive("/") || isActive("/home")}
-              onClick={() => navigate("/ticket-table")}
-            >
-              <HomeRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Home</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton
               selected={isActive("/ticket-table")}
               onClick={() => navigate("/ticket-table")}
             >
               <DashboardRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Dashboard</Typography>
+                <Typography level="title-sm">Gestion des tickets</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>

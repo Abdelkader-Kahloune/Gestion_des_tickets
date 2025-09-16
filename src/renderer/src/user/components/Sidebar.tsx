@@ -10,8 +10,8 @@ import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import ConfirmationNumberRoundedIcon from "@mui/icons-material/ConfirmationNumberRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { closeSidebar } from "../utils";
@@ -129,19 +129,19 @@ export const Sidebar: FC<{ id?: string }> = ({ id }) => {
           }}
         >
           <ListItem>
-            <ListItemButton onClick={() => navigate(`/user/${id}`)}>
-              <PersonRoundedIcon />
+            <ListItemButton onClick={() => navigate(`/ticket/${id}`)}>
+              <ConfirmationNumberRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Profile</Typography>
+                <Typography level="title-sm">Tickets</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
 
           <ListItem>
-            <ListItemButton onClick={() => navigate(`/ticket/${id}`)}>
-              <ConfirmationNumberRoundedIcon />
+            <ListItemButton onClick={() => navigate(`/my-tickets/${id}`)}>
+              <ReceiptLongRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Tickets</Typography>
+                <Typography level="title-sm">Mes Tickets</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
