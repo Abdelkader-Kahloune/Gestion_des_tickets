@@ -137,14 +137,6 @@ export const Sidebar: FC<{ id?: string }> = ({ id }) => {
             </ListItemButton>
           </ListItem>
 
-          <ListItem>
-            <ListItemButton onClick={() => navigate(`/my-tickets/${id}`)}>
-              <ReceiptLongRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Mes Tickets</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
         </List>
       </Box>
       <Divider />
