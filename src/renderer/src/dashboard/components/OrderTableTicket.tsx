@@ -68,29 +68,6 @@ export default function OrderTable() {
     [key: string]: string;
   }>({});
 
-  // Helper function to get restoration name by ID
-  const getRestorationNameById = (restorationId: string | number): string => {
-    if (!restorationId) return "";
-
-    // If it's already a string (name), return it
-    if (typeof restorationId === "string" && isNaN(Number(restorationId))) {
-      return restorationId;
-    }
-
-    // If it's an ID, find the corresponding name
-    const restoration = restorations.find(
-      (r) => r.id === Number(restorationId)
-    );
-    return restoration ? restoration.nom : "";
-  };
-
-  // Helper function to get restoration ID by name
-  const getRestorationIdByName = (restorationName: string): number | null => {
-    if (!restorationName) return null;
-    const restoration = restorations.find((r) => r.nom === restorationName);
-    return restoration ? restoration.id : null;
-  };
-
   const loadTickets = async () => {
     try {
       const tickets = await window.api.getTickets();

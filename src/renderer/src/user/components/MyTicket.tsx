@@ -60,6 +60,7 @@ export const MyTicket: FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState<number | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
@@ -95,6 +96,7 @@ export const MyTicket: FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const loadTickets = async () => {
     if (id) {
       try {
@@ -123,6 +125,7 @@ export const MyTicket: FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleSelectChange = (name: string, value: string | null) => {
     setForm({ ...form, [name]: value || "" });
 
@@ -132,7 +135,7 @@ export const MyTicket: FC = () => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = (): void => {
     setForm({
       matricule: id || "",
       nomPrenom: "",
@@ -146,6 +149,7 @@ export const MyTicket: FC = () => {
     setValidationErrors({});
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleEdit = (ticket: Ticket) => {
     setForm({
       matricule: ticket.matricule.toString(),
@@ -159,15 +163,16 @@ export const MyTicket: FC = () => {
     setEditingTicketId(ticket.id);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (): void => {
     resetForm();
   };
 
-  const handleDeleteClick = (ticketId: number) => {
+  const handleDeleteClick = (ticketId: number): void => {
     setTicketToDelete(ticketId);
     setDeleteConfirmOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleDeleteConfirm = async () => {
     if (ticketToDelete) {
       try {
@@ -182,8 +187,8 @@ export const MyTicket: FC = () => {
             res?.message || "Erreur lors de la suppression du ticket."
           );
         }
-      } catch (err: any) {
-        setErrorMsg(err?.message || "Erreur lors de la suppression du ticket.");
+      } catch (err) {
+        setErrorMsg("Erreur lors de la suppression du ticket." + err);
       } finally {
         setLoading(false);
         setDeleteConfirmOpen(false);
@@ -192,17 +197,18 @@ export const MyTicket: FC = () => {
     }
   };
 
-  const handleDeleteCancel = () => {
+  const handleDeleteCancel = (): void => {
     setDeleteConfirmOpen(false);
     setTicketToDelete(null);
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const getRestorationName = (restorationId: string) => {
     const resto = restorations.find((r) => r.id.toString() === restorationId);
     return resto ? resto.nom : restorationId;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg(null);
@@ -261,10 +267,9 @@ export const MyTicket: FC = () => {
             `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.`
         );
       }
-    } catch (err: any) {
+    } catch (err) {
       setErrorMsg(
-        err?.message ||
-          `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.`
+        `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.${err}`
       );
     } finally {
       setLoading(false);
@@ -274,9 +279,8 @@ export const MyTicket: FC = () => {
   useEffect(() => {
     loadTickets();
     loadRestorations();
-  }, [id]);
+  }, [id, loadTickets]);
 
-  // Clear messages after 5 seconds
   useEffect(() => {
     if (successMsg || errorMsg) {
       const timer = setTimeout(() => {
@@ -285,6 +289,9 @@ export const MyTicket: FC = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
+
+    // Return empty cleanup function when no messages
+    return () => {};
   }, [successMsg, errorMsg]);
 
   return (
@@ -378,7 +385,7 @@ export const MyTicket: FC = () => {
                 <Select
                   placeholder="Sélectionner une restauration"
                   value={form.restoration}
-                  onChange={(event, value) =>
+                  onChange={(_, value) =>
                     handleSelectChange("restoration", value)
                   }
                 >

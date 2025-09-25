@@ -107,7 +107,7 @@ ipcMain.handle(
       return {
         success: false,
         message: "Failed to add user.",
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -161,7 +161,10 @@ ipcMain.handle("send-password-email", async (_e, email: string) => {
 
     return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -208,7 +211,10 @@ ipcMain.handle("add-ticket", (_e, ticket) => {
     );
     return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -235,7 +241,10 @@ ipcMain.handle("update-ticket", (_e, ticket) => {
       return { success: false, message: "Ticket not found" };
     }
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -244,7 +253,10 @@ ipcMain.handle("delete-ticket", (_e, matricule: number) => {
     db.prepare("DELETE FROM tickets WHERE matricule = ?").run(matricule);
     return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -258,7 +270,10 @@ ipcMain.handle("delete-ticket-by-id", (_e, ticketId: number) => {
       return { success: false, message: "Ticket not found" };
     }
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -277,10 +292,18 @@ ipcMain.handle("add-restoration", (_e, resto: { nom: string }) => {
     db.prepare("INSERT INTO restoration (nom) VALUES (?)").run(resto.nom);
     return { success: true };
   } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as any).code === "SQLITE_CONSTRAINT_UNIQUE"
+    ) {
       return { success: false, message: "Restaurant name already exists" };
     }
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -297,10 +320,18 @@ ipcMain.handle(
         return { success: false, message: "Restoration not found" };
       }
     } catch (error) {
-      if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as any).code === "SQLITE_CONSTRAINT_UNIQUE"
+      ) {
         return { success: false, message: "Restaurant name already exists" };
       }
-      return { success: false, message: error.message };
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : String(error),
+      };
     }
   }
 );
@@ -328,7 +359,10 @@ ipcMain.handle("delete-restoration", (_e, id: number) => {
       return { success: false, message: "Restoration not found" };
     }
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 });
 
@@ -397,29 +431,4 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
-});
-
-// Image generation import and handler
-import { generatePixelAnimalImage } from "./modules/img_gen";
-
-async function handleImageGeneration() {
-  try {
-    // Use proper paths - input image from resources, output to user data
-    const inputImagePath = path.join(__dirname, "../../resources/img.png");
-    const outputDir = path.join(app.getPath("userData"), "generated_images");
-
-    const savedFiles = await generatePixelAnimalImage(
-      inputImagePath,
-      outputDir
-    );
-    console.log("Image generation completed!", savedFiles);
-    return { success: true, files: savedFiles };
-  } catch (error) {
-    console.error("Failed to generate image:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-ipcMain.handle("generate-pixel-animal", async (_e) => {
-  return await handleImageGeneration();
 });
