@@ -20,7 +20,7 @@ import DialogContent from "@mui/joy/DialogContent";
 import DialogActions from "@mui/joy/DialogActions";
 import type { FC } from "react";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 interface Ticket {
   id: number;
@@ -445,7 +445,9 @@ export const MyTicket: FC = () => {
       <Card sx={{ width: "100%", maxWidth: 1000 }}>
         <CardContent>
           <Box
+            id="mes-tickets"
             sx={{
+              scrollMarginTop: 'calc(var(--Header-height) + 16px)',
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",

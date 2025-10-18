@@ -11,7 +11,9 @@ const router = createBrowserRouter([
   { path: "/inscription", element: <Inscription /> },
   { path: "/ticket-table", element: <TicketTable /> },
   { path: "/personnel-table", element: <PersonnelTable /> },
+
   { path: "/ticket/:id", element: <MyTicket /> },
+  { path: "/my-tickets/:id", element: <MyTicket /> },
   { path: "mot_de_passe_oublié", element: <RestorePassword /> },
   //{path:"/user/:id",element:<User/>}//cosnt id = useParams(),
 ]);

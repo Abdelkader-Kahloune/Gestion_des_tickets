@@ -24,8 +24,9 @@ interface Personnel {
   role?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function OrderTablePersonnel() {
+import type React from "react";
+
+export default function OrderTablePersonnel(): React.ReactElement {
   const [rows, setRows] = useState<Personnel[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -162,22 +163,33 @@ export default function OrderTablePersonnel() {
 
   return (
     <>
-      <Box sx={{ overflowX: "auto" }}>
-        <Typography level="h4" sx={{ mb: 2 }}>
-          Gestion des personnels TT
-        </Typography>
-        <Table hoverRow>
-          <thead>
-            <tr>
-              <th>Matricule</th>
-              <th>Nom</th>
-              <th>Login</th>
-              <th>Email</th>
-              <th>Adresse</th>
-              <th>Rôle</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      <Box sx={{
+          overflowX: "auto",
+          scrollbarWidth: "thin",
+          scrollbarColor: "#9aa4b2 transparent",
+          "&::-webkit-scrollbar": { height: { xs: 6, sm: 8 } },
+          "&::-webkit-scrollbar-track": { background: "transparent" },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#9aa4b2",
+            borderRadius: 9999,
+            border: "2px solid transparent",
+            backgroundClip: "padding-box",
+          },
+          "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "#7b8794" },
+          "&::-webkit-scrollbar-thumb:active": { backgroundColor: "#5f6b7a" },
+        }}>
+                                   <Table hoverRow sx={{ width: 'max-content', minWidth: '100%', tableLayout: { xs: 'fixed', md: 'auto' }, '& th, & td': { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', p: 1 } }}>
+           <thead>
+             <tr>
+               <th style={{ width: 110 }}>Matricule</th>
+               <th style={{ minWidth: 160 }}>Nom</th>
+               <th style={{ minWidth: 140 }}>Login</th>
+               <th style={{ minWidth: 220 }}>Email</th>
+               <th style={{ minWidth: 220 }}>Adresse</th>
+               <th style={{ width: 120 }}>Rôle</th>
+               <th style={{ width: 160 }}>Actions</th>
+             </tr>
+           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.matricule}>

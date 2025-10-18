@@ -186,7 +186,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                       setLoading(false);
                     }, 1000);
                   }
-                } catch (error) {
+                } catch {
                   setOpenSnackbar(true);
                   setLoading(false);
                 }

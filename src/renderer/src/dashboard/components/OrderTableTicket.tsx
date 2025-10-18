@@ -500,7 +500,7 @@ export default function OrderTable() {
               <th>Type de Ticket</th>
               <th>Restauration</th>
               <th>Offre</th>
-              <th>Actions</th>
+              <th style={{ width: 160 }}>Actions</th>
             </tr>
           </thead>
           <tbody>

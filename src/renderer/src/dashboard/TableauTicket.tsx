@@ -1,17 +1,15 @@
 import { CssVarsProvider } from "@mui/joy/styles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
 import Typography from "@mui/joy/Typography";
-
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import Sidebar from "./components/Sidebar";
 import OrderTableTicket from "./components/OrderTableTicket";
 import Header from "./components/Header";
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function JoyOrderDashboardTemplate() {
+import type React from "react";
+
+export default function JoyOrderDashboardTemplate(): React.ReactElement {
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
@@ -51,13 +49,6 @@ export default function JoyOrderDashboardTemplate() {
             <Typography level="h2" component="h1">
               Gestion des tickets
             </Typography>
-            <Button
-              color="primary"
-              startDecorator={<DownloadRoundedIcon />}
-              size="sm"
-            >
-              Download PDF
-            </Button>
           </Box>
           <OrderTableTicket />
         </Box>

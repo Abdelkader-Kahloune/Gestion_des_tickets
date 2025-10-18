@@ -59,7 +59,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
   type AddUserResponse = {
     success: boolean;
     message?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 
   const addUser = async (
@@ -78,7 +78,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
     };
 
     try {
-      const res = (await window.api.addUser(data)) as AddUserResponse;
+      const res = (await window.api.addUser(data)) as unknown as AddUserResponse;
       if (res && res.success === false && res.message) {
         setOpenSnackbar(true);
         setLoading(false);
@@ -88,12 +88,12 @@ export default function JoySignInSideTemplate(): React.ReactElement {
           setLoading(false);
         }, 1000);
       }
-    } catch (error: any) {
-      if (
-        typeof error?.message === "string" &&
-        (error.message.includes("constraint failed") ||
-          error.message.includes("already exists"))
-      ) {
+    } catch (error: unknown) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String((error as { message: unknown }).message)
+          : "";
+      if (message.includes("constraint failed") || message.includes("already exists")) {
         setOpenSnackbar(true);
       }
       setLoading(false);

@@ -5,8 +5,9 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import MyTicket from "./components/MyTicket";
 import { useParams } from "react-router-dom"; // Import useParams to access URL parameters
+import React from "react";
 
-const User = () => {
+function User(): React.ReactElement {
   const id = useParams().id; // Assuming you want to use the id from the URL params
   return (
     <CssVarsProvider disableTransitionOnChange>
