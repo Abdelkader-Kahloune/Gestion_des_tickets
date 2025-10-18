@@ -129,15 +129,6 @@ export const Sidebar: FC<{ id?: string }> = ({ id }) => {
           }}
         >
           <ListItem>
-            <ListItemButton onClick={() => navigate(`/user/${id}`)}>
-              <PersonRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Profile</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
             <ListItemButton onClick={() => navigate(`/ticket/${id}`)}>
               <ConfirmationNumberRoundedIcon />
               <ListItemContent>
@@ -162,7 +153,12 @@ export const Sidebar: FC<{ id?: string }> = ({ id }) => {
           size="sm"
           variant="plain"
           color="neutral"
-          onClick={() => navigate("login")}
+          onClick={(e) => {
+            e.stopPropagation();
+            closeSidebar();
+            window.location.assign("/login"); // or window.location.href = "/login";
+          }}
+          aria-label="Logout"
         >
           <LogoutRoundedIcon />
         </IconButton>

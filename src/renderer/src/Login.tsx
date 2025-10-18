@@ -181,7 +181,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
                       if (user.role === "admin") {
                         navigate("/ticket-table");
                       } else {
-                        navigate(`/user/${user.matricule}`);
+                        navigate(`/ticket/${user.matricule}`);
                       }
                       setLoading(false);
                     }, 1000);

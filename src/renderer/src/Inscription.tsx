@@ -84,7 +84,7 @@ export default function JoySignInSideTemplate(): React.ReactElement {
         setLoading(false);
       } else {
         setTimeout(() => {
-          navigate(`/user/${data.matricule}`);
+          navigate(`/ticket/${data.matricule}`);
           setLoading(false);
         }, 1000);
       }

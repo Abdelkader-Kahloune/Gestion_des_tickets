@@ -6,7 +6,7 @@ import Database from "better-sqlite3";
 import path from "path";
 import nodemailer from "nodemailer";
 
-const db = new Database(path.join(app.getPath("userData"), "user.db"));
+const db = new Database(path.join(app.getPath("userData"), "userData.db"));
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
   matricule INTEGER PRIMARY KEY,
@@ -74,7 +74,7 @@ if (restoCount === 0) {
   defaultRestorations.forEach((name) => {
     try {
       insertResto.run(name);
-    } catch (error) {
+    } catch {
       console.log(`Restaurant ${name} might already exist`);
     }
   });
