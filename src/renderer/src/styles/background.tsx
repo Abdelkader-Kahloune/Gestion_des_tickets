@@ -55,7 +55,6 @@ const NeatBackground = () => {
       waveAmplitude: 2,
       shadows: 1,
       highlights: 1,
-      saturation: 5,
       wireframe: false,
       colorBlending: 5,
       backgroundColor: "#000000",

@@ -154,7 +154,12 @@ export const Sidebar: FC<{ id?: string }> = ({ id }) => {
           size="sm"
           variant="plain"
           color="neutral"
-          onClick={() => navigate("login")}
+          onClick={(e) => {
+            e.stopPropagation();
+            closeSidebar();
+            window.location.assign("/login"); // or window.location.href = "/login";
+          }}
+          aria-label="Logout"
         >
           <LogoutRoundedIcon />
         </IconButton>

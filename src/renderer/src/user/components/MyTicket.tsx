@@ -8,6 +8,8 @@ import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import Radio from "@mui/joy/Radio";
 import RadioGroup from "@mui/joy/RadioGroup";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
 import Divider from "@mui/joy/Divider";
 import Stack from "@mui/joy/Stack";
 import Table from "@mui/joy/Table";
@@ -27,7 +29,12 @@ interface Ticket {
   nombre: number;
   typeTicket: string;
   offre: string;
-  dateCreation?: string;
+  restoration?: string;
+}
+
+interface Restoration {
+  id: number;
+  nom: string;
 }
 
 export const MyTicket: FC = () => {
@@ -38,6 +45,7 @@ export const MyTicket: FC = () => {
     nombre: 1,
     typeTicket: "subventionne",
     offre: "self-service",
+    restoration: "",
   });
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -46,11 +54,13 @@ export const MyTicket: FC = () => {
     [key: string]: string;
   }>({});
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [restorations, setRestorations] = useState<Restoration[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState<number | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
@@ -69,10 +79,24 @@ export const MyTicket: FC = () => {
       errors.nombre = "Le nombre doit être au moins 1";
     }
 
+    if (!form.restoration) {
+      errors.restoration = "La restauration est requise";
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
+  const loadRestorations = async () => {
+    try {
+      const restoList = await window.api.getRestorations();
+      setRestorations(restoList || []);
+    } catch (error) {
+      console.error("Erreur lors du chargement des restaurations:", error);
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const loadTickets = async () => {
     if (id) {
       try {
@@ -101,19 +125,31 @@ export const MyTicket: FC = () => {
     }
   };
 
-  const resetForm = () => {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const handleSelectChange = (name: string, value: string | null) => {
+    setForm({ ...form, [name]: value || "" });
+
+    // Clear validation error for this field when user makes a selection
+    if (validationErrors[name]) {
+      setValidationErrors({ ...validationErrors, [name]: "" });
+    }
+  };
+
+  const resetForm = (): void => {
     setForm({
       matricule: id || "",
       nomPrenom: "",
       nombre: 1,
       typeTicket: "subventionne",
       offre: "self-service",
+      restoration: "",
     });
     setIsEditing(false);
     setEditingTicketId(null);
     setValidationErrors({});
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleEdit = (ticket: Ticket) => {
     setForm({
       matricule: ticket.matricule.toString(),
@@ -121,20 +157,22 @@ export const MyTicket: FC = () => {
       nombre: ticket.nombre,
       typeTicket: ticket.typeTicket,
       offre: ticket.offre,
+      restoration: ticket.restoration || "",
     });
     setIsEditing(true);
     setEditingTicketId(ticket.id);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = (): void => {
     resetForm();
   };
 
-  const handleDeleteClick = (ticketId: number) => {
+  const handleDeleteClick = (ticketId: number): void => {
     setTicketToDelete(ticketId);
     setDeleteConfirmOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleDeleteConfirm = async () => {
     if (ticketToDelete) {
       try {
@@ -149,8 +187,8 @@ export const MyTicket: FC = () => {
             res?.message || "Erreur lors de la suppression du ticket."
           );
         }
-      } catch (err: any) {
-        setErrorMsg(err?.message || "Erreur lors de la suppression du ticket.");
+      } catch (err) {
+        setErrorMsg("Erreur lors de la suppression du ticket." + err);
       } finally {
         setLoading(false);
         setDeleteConfirmOpen(false);
@@ -159,12 +197,18 @@ export const MyTicket: FC = () => {
     }
   };
 
-  const handleDeleteCancel = () => {
+  const handleDeleteCancel = (): void => {
     setDeleteConfirmOpen(false);
     setTicketToDelete(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const getRestorationName = (restorationId: string) => {
+    const resto = restorations.find((r) => r.id.toString() === restorationId);
+    return resto ? resto.nom : restorationId;
+  };
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg(null);
@@ -195,6 +239,7 @@ export const MyTicket: FC = () => {
           nombre: Number(form.nombre),
           typeTicket: form.typeTicket,
           offre: form.offre,
+          restoration: form.restoration,
         });
       } else {
         // Add new ticket
@@ -204,6 +249,7 @@ export const MyTicket: FC = () => {
           nombre: Number(form.nombre),
           typeTicket: form.typeTicket,
           offre: form.offre,
+          restoration: form.restoration,
         });
       }
 
@@ -221,10 +267,9 @@ export const MyTicket: FC = () => {
             `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.`
         );
       }
-    } catch (err: any) {
+    } catch (err) {
       setErrorMsg(
-        err?.message ||
-          `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.`
+        `Erreur lors de ${isEditing ? "la modification" : "l'ajout"} du ticket.${err}`
       );
     } finally {
       setLoading(false);
@@ -233,9 +278,9 @@ export const MyTicket: FC = () => {
 
   useEffect(() => {
     loadTickets();
-  }, [id]);
+    loadRestorations();
+  }, [id, loadTickets]);
 
-  // Clear messages after 5 seconds
   useEffect(() => {
     if (successMsg || errorMsg) {
       const timer = setTimeout(() => {
@@ -244,6 +289,9 @@ export const MyTicket: FC = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
+
+    // Return empty cleanup function when no messages
+    return () => {};
   }, [successMsg, errorMsg]);
 
   return (
@@ -332,6 +380,28 @@ export const MyTicket: FC = () => {
                 </RadioGroup>
               </FormControl>
 
+              <FormControl required error={!!validationErrors.restoration}>
+                <FormLabel>Restauration :</FormLabel>
+                <Select
+                  placeholder="Sélectionner une restauration"
+                  value={form.restoration}
+                  onChange={(_, value) =>
+                    handleSelectChange("restoration", value)
+                  }
+                >
+                  {restorations.map((resto) => (
+                    <Option key={resto.id} value={resto.id.toString()}>
+                      {resto.nom}
+                    </Option>
+                  ))}
+                </Select>
+                {validationErrors.restoration && (
+                  <Typography color="danger" level="body-sm">
+                    {validationErrors.restoration}
+                  </Typography>
+                )}
+              </FormControl>
+
               {successMsg && (
                 <Typography color="success" level="body-sm">
                   {successMsg}
@@ -407,7 +477,7 @@ export const MyTicket: FC = () => {
                     <th>Nombre</th>
                     <th>Type</th>
                     <th>Offre</th>
-                    <th>Date</th>
+                    <th>Restauration</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -433,12 +503,11 @@ export const MyTicket: FC = () => {
                       </td>
                       <td>{ticket.offre}</td>
                       <td>
-                        {ticket.dateCreation
-                          ? new Date(ticket.dateCreation).toLocaleDateString(
-                              "fr-FR"
-                            )
+                        {ticket.restoration
+                          ? getRestorationName(ticket.restoration)
                           : "-"}
                       </td>
+
                       <td>
                         <Stack direction="row" spacing={1}>
                           <Button

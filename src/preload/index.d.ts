@@ -14,8 +14,9 @@ declare global {
         email: string;
         adresse: string;
         mot_de_passe: string;
-      }) => Promise<void>;
+      }) => Promise<{ success: boolean; message?: string }>;
       updateUser: (userData: {
+        matricule: number; // Added matricule for proper identification
         login: string;
         nom: string;
         email: string;
@@ -33,6 +34,7 @@ declare global {
         nombre: number;
         typeTicket: string;
         offre: string;
+        restoration?: string;
       }) => Promise<{ success: boolean; message?: string }>;
       deleteTicket: (
         matricule: number
@@ -44,10 +46,31 @@ declare global {
         nombre: number;
         typeTicket: string;
         offre: string;
+        restoration?: string;
       }) => Promise<{ success: boolean; message?: string }>;
       deleteTicketById: (
         ticketId: number
       ) => Promise<{ success: boolean; message?: string }>;
+
+      // Restoration CRUD
+      getRestorations: () => Promise<Array<{ id: number; nom: string }>>;
+      addRestoration: (resto: {
+        nom: string;
+      }) => Promise<{ success: boolean; message?: string }>;
+      updateRestoration: (resto: {
+        id: number;
+        nom: string;
+      }) => Promise<{ success: boolean; message?: string }>;
+      deleteRestoration: (
+        id: number
+      ) => Promise<{ success: boolean; message?: string }>;
+
+      // Image generation
+      generatePixelAnimal: () => Promise<{
+        success: boolean;
+        files?: string[];
+        error?: string;
+      }>;
     };
   }
 }

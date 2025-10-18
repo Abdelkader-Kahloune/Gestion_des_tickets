@@ -73,27 +73,23 @@ export default function OrderTablePersonnel(): React.ReactElement {
     setEditModalOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (): Promise<void> => {
     if (!selectedPersonnel) return;
 
     setLoading(true);
     try {
-      const result = await window.api.deleteUser(selectedPersonnel.matricule);
-      if (result.changes > 0) {
-        loadPersonnel(); // Refresh the table
-        setDeleteModalOpen(false);
-        setSelectedPersonnel(null);
-      } else {
-        alert("Erreur lors de la suppression - utilisateur non trouvé");
-      }
+      await window.api.deleteUser(selectedPersonnel.matricule);
+      loadPersonnel(); // Refresh the table
+      setDeleteModalOpen(false);
+      setSelectedPersonnel(null);
     } catch (error) {
-      alert("Erreur lors de la suppression");
+      alert("Erreur lors de la suppression" + error);
     } finally {
       setLoading(false);
     }
   };
 
-  const validateEditForm = () => {
+  const validateEditForm = (): boolean => {
     const errors: { [key: string]: string } = {};
 
     if (!editForm.nom.trim()) {
@@ -129,12 +125,12 @@ export default function OrderTablePersonnel(): React.ReactElement {
     return Object.keys(errors).length === 0;
   };
 
-  const handleEditSubmit = async () => {
+  const handleEditSubmit = async (): Promise<void> => {
     if (!selectedPersonnel || !validateEditForm()) return;
 
     setLoading(true);
     try {
-      const result = await window.api.updateUser({
+      await window.api.updateUser({
         matricule: selectedPersonnel.matricule,
         nom: editForm.nom.trim(),
         login: editForm.login.trim(),
@@ -143,21 +139,19 @@ export default function OrderTablePersonnel(): React.ReactElement {
         mot_de_passe: editForm.mot_de_passe.trim(),
       });
 
-      if (result.changes > 0) {
-        loadPersonnel(); // Refresh the table
-        setEditModalOpen(false);
-        setSelectedPersonnel(null);
-      } else {
-        alert("Erreur lors de la modification - utilisateur non trouvé");
-      }
+      loadPersonnel(); // Refresh the table
+      setEditModalOpen(false);
+      setSelectedPersonnel(null);
     } catch (error) {
-      alert("Erreur lors de la modification");
+      alert("Erreur lors de la modification" + error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditFormChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const { name, value } = e.target;
     setEditForm({ ...editForm, [name]: value });
 

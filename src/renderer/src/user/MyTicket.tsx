@@ -35,5 +35,5 @@ function User(): React.ReactElement {
       </Box>
     </CssVarsProvider>
   );
-}
+};
 export default User;
