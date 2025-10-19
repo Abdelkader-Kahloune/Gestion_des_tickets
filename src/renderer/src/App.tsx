@@ -3,7 +3,6 @@ import Inscription from "./Inscription";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import TicketTable from "./dashboard/TableauTicket";
 import PersonnelTable from "./dashboard/TableauPersonnel";
-
 import MyTicket from "./user/MyTicket";
 import RestorePassword from "./RestorePassword";
 
